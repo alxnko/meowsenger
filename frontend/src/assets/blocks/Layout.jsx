@@ -1,5 +1,5 @@
-import React, { useContext, useState } from "react";
-import { Outlet } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 import { AuthContext, LoaderContext } from "../contexts/contexts";
 import Loader from "./Loader/Loader";
 import Menu from "./Menu/Menu";
@@ -7,8 +7,16 @@ import SubMenu from "./Menu/SubMenu";
 
 export default function Layout() {
   const user = useContext(AuthContext);
-  const [isLoader, setIsLoader] = useContext(LoaderContext);
+  const [isLoader] = useContext(LoaderContext);
   const [isMenuOpen, openMenu] = useState(false);
+  const [isOnTop, setOnTop] = useState(window.location.href.includes("/chat/"));
+  const navigate = useNavigate();
+  useEffect(() => {
+    setOnTop(
+      window.location.href.includes("/chat/") ||
+        window.location.href.includes("/group/")
+    );
+  }, [navigate]);
   const switchMenu = () => {
     if (isMenuOpen) {
       openMenu(false);
@@ -18,9 +26,9 @@ export default function Layout() {
   };
   return (
     <>
-      <SubMenu show={isMenuOpen} />
+      <SubMenu isOnTop={isOnTop} show={isMenuOpen} openMenu={openMenu} />
       <Loader show={isLoader} />
-      <Menu user={user} switchMenu={switchMenu} />
+      <Menu isOnTop={isOnTop} user={user} switchMenu={switchMenu} />
       <main>
         <div className="content">
           <Outlet />

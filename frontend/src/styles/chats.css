@@ -1,0 +1,42 @@
+/*
+chats
+*/
+.new-chat {
+  position: fixed;
+  min-height: calc(100 * var(--vh) - 3px);
+  width: 100%;
+  z-index: 999;
+  align-items: center;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  background-color: var(--blurcolor);
+}
+.new-chat .block {
+  max-width: 300px;
+}
+.chats {
+  width: 100%;
+  margin-bottom: 90px;
+}
+.chat-prev {
+  text-align: left;
+  width: 350px;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: var(--simplecolor);
+  margin-top: 10px;
+}
+.chat-prev .msg-prev {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 290px;
+}
+.chat-prev .time {
+  text-align: right;
+}
+.chat-prev:hover p,
+.chat-prev:hover h2 {
+  color: var(--simplecolor) !important;
+}

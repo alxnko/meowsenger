@@ -1,3 +1,4 @@
+import { t } from "i18next";
 import React, { forwardRef, useContext } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../contexts/contexts";
@@ -18,21 +19,26 @@ const ChatBlock = forwardRef(({ chatdata }, ref) => {
               {chatdata.isGroup ? "g." : "u."}
               {chatdata.name}
             </h2>
-            <p className="msg">
-              {chatdata.lastMessage.author != ""
-                ? chatdata.lastMessage.author == user.username
-                  ? "you: "
-                  : chatdata.lastMessage.author + ": "
+            <p
+              style={chatdata.isUnread ? { color: "var(--redcolor)" } : {}}
+              className="time"
+            >
+              {chatdata.isUnread ? "• " : ""}
+              {toLocalTime(chatdata.lastUpdate).toLocaleString()}
+            </p>
+            <p className="msg-prev">
+              {user
+                ? chatdata.lastMessage.author != ""
+                  ? chatdata.lastMessage.author == user.username
+                    ? "you: "
+                    : chatdata.lastMessage.author + ": "
+                  : ""
                 : ""}
-              {chatdata.lastMessage.text}
+              {chatdata.lastMessage.text != "no messages"
+                ? chatdata.lastMessage.text
+                : t("nomessages")}
             </p>
           </div>
-          <p
-            style={chatdata.isUnread ? { color: "var(--redcolor)" } : {}}
-            className="time"
-          >
-            {toLocalTime(chatdata.lastUpdate).toLocaleString()}
-          </p>
         </button>
       </Link>
     </div>

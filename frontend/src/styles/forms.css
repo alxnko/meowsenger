@@ -1,0 +1,14 @@
+/*
+forms
+*/
+input,
+textarea {
+  width: 100%;
+  margin: 5px 0;
+  padding: 0;
+  background-color: var(--simplecolor);
+  color: var(--pcolor);
+  border: none;
+  border-bottom: var(--greencolor) solid 1px;
+  font-size: 24px;
+}

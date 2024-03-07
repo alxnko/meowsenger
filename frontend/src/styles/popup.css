@@ -1,0 +1,9 @@
+.popup {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: var(--simplecolor);
+  padding: 10px;
+  border-radius: 10px;
+}

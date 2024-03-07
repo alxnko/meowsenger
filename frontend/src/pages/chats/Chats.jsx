@@ -1,10 +1,15 @@
 import React, { createRef, useContext, useEffect, useState } from "react";
 import IsAuth from "../../assets/blocks/Auth/IsAuth";
 import ChatBlock from "../../assets/blocks/Chats/ChatBlock";
-import { AuthContext, LoaderContext } from "../../assets/contexts/contexts";
+import {
+  AuthContext,
+  LoaderContext,
+  TranslationContext,
+} from "../../assets/contexts/contexts";
 import { createPostData } from "../../assets/scripts/createPostData";
 
 export default function Chats() {
+  const { t } = useContext(TranslationContext);
   const user = useContext(AuthContext);
   const [isLoader, setIsLoader] = useContext(LoaderContext);
   let lastUpdate = 0;
@@ -34,25 +39,22 @@ export default function Chats() {
       if (data.status) {
         if ("data" in data) {
           setChats(data.data);
-          setIsLoader(false);
         }
         lastUpdate = parseInt(data.time);
       }
+      setIsLoader(false);
     }
   };
   return (
     <div>
       <IsAuth />
-      <p>chat list</p>
+      <p>{t("chatlist")}</p>
       <div>
         <div className="chats">
           <div className="flex">
-            <button className="chat-prev">start new chat</button>
-            <button
-              style={{ textAlign: "right", marginLeft: 10 }}
-              className="chat-prev"
-            >
-              start new group
+            <button className="chat-prev">{t("newchat")}</button>
+            <button style={{ marginLeft: 10 }} className="chat-prev">
+              {t("newgroup")}
             </button>
           </div>
           <div className="chatlist">

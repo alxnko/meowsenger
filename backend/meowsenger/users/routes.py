@@ -21,6 +21,24 @@ def get_current_user():
     return user_to_dict(current_user) if current_user.is_authenticated else {"error": "notAuth"}
 
 
+@users.route("/api/u/register", methods=['POST'])
+def register():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    if (len(username) < 3 or len(password) < 8):
+        return {"status": False, "reason": "len"}, 403
+    u = User.query.filter_by(username=username).first()
+    if u:
+        return {"status": False, "reason": "username"}, 422
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+    user = User(username=username, password=hashed_password)
+    db.session.add(user)
+    db.session.commit()
+    login_user(user, remember=True)
+    return {"status": True}
+
+
 @users.route("/api/u/login", methods=['POST'])
 def login():
     data = request.get_json()

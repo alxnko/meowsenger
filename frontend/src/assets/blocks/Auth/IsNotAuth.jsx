@@ -1,12 +1,14 @@
-import React, { useContext } from "react";
-import { Navigate } from "react-router-dom";
+import React, { useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../contexts/contexts";
 
 export default function IsNotAuth() {
+  const navigate = useNavigate();
   const user = useContext(AuthContext);
-  if (user != {}) {
-    return <Navigate to="/chats" />;
-  }
-
+  useEffect(() => {
+    if (user && user != "unAuth") {
+      navigate("/login");
+    }
+  }, [user]);
   return <></>;
 }

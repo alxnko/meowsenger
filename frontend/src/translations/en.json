@@ -4,5 +4,21 @@
   "username": "username",
   "password": "passwords",
   "confirm": "confirm",
-  "error404": "error 404"
+
+  "baddata": "fields are empty or filled in incorrectly",
+  "unauth": "authorization failed, check your username and password",
+  "takenusername": "username is already taken",
+
+  "error404": "error 404",
+
+  "chatlist": "chat list",
+  "newchat": "new chat",
+  "newgroup": "new group",
+
+  "nomessages": "no messages",
+  "startchatting": "start chatting",
+
+  "lang": "language",
+  "loading": "loading",
+  "testdesc": "meowsenger is great"
 }

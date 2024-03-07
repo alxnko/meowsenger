@@ -1,0 +1,30 @@
+/*
+blocks
+*/
+.block {
+  padding: 30px;
+  background-color: var(--simplecolor);
+  border-radius: 30px;
+}
+.container {
+  display: flex;
+}
+.flex {
+  display: flex;
+}
+.flex-center {
+  display: flex;
+  justify-content: center;
+}
+.full-bg {
+  min-height: calc(100 * var(--vh) - 3px);
+  top: 0;
+  left: 0;
+  width: 100%;
+  margin: auto;
+  position: fixed;
+  justify-content: center;
+  background: var(--blurcolor);
+  backdrop-filter: saturate(180%) blur(10px);
+  -webkit-backdrop-filter: saturate(180%) blur(10px);
+}

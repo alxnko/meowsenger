@@ -1,0 +1,52 @@
+/*
+text
+*/
+h1,
+h2 {
+  margin: 0;
+  color: var(--hcolor);
+}
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  color: var(--h2color);
+}
+p,
+label,
+span {
+  display: block;
+  margin: 0;
+  color: var(--pcolor);
+}
+.center {
+  text-align: center;
+}
+a {
+  color: var(--hcolor);
+}
+a.link {
+  color: var(--hcolor);
+  padding: 0 2px;
+  border-bottom: var(--greencolor) solid 2px;
+}
+a.link:hover {
+  color: var(--bgcolor);
+  background-color: var(--greencolor);
+}
+.time {
+  font-size: 12px;
+}
+.blur {
+  background: var(--blurcolor);
+  backdrop-filter: saturate(180%) blur(10px);
+  -webkit-backdrop-filter: saturate(180%) blur(10px);
+}
+.invalid-feedback {
+  text-align: center;
+}
+.invalid-feedback span {
+  max-width: 300px;
+  color: var(--redcolor);
+}
