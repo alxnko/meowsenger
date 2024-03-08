@@ -3,8 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from meowsenger.config import Config
-import time
-import os
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()

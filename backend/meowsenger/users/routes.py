@@ -1,4 +1,4 @@
-from flask import render_template, url_for, flash, redirect, request, Blueprint, jsonify
+from flask import redirect, request, Blueprint
 from flask_login import login_user, current_user, logout_user, login_required
 from meowsenger.models import Chat, User, Message
 # from meowsenger.main.routes import mark_as_read

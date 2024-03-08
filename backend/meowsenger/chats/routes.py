@@ -1,8 +1,8 @@
-from flask import render_template, url_for, flash, redirect, request, Blueprint, jsonify
-from flask_login import login_user, current_user, logout_user, login_required
+from flask import request, Blueprint
+from flask_login import current_user, login_required
 from meowsenger.models import Chat, User, Message
 from meowsenger.messages.routes import message_to_dict
-from meowsenger import db, bcrypt
+from meowsenger import db
 from datetime import datetime
 import time
 
@@ -11,8 +11,8 @@ chats = Blueprint('chats', __name__)
 
 def mark_as_read(chat):
     for i in range(1, len(chat.messages) + 1):
-        if current_user in chat.messages[-i].unreadby:
-            chat.messages[-i].unreadby.remove(current_user)
+        if current_user in chat.messages[-i].unread_by:
+            chat.messages[-i].unread_by.remove(current_user)
         else:
             break
     db.session.add(chat)
@@ -20,7 +20,7 @@ def mark_as_read(chat):
 
 def mark_as_not_read(chat, msg):
     for user in chat.users:
-        msg.unreadby.append(user)
+        msg.unread_by.append(user)
 
 
 def messages_to_arr(chat, frm=1, to=50):
@@ -30,7 +30,7 @@ def messages_to_arr(chat, frm=1, to=50):
         return [message_to_dict(msg) for msg in chat.messages[-to:-frm]]
 
 
-def chat_to_blockdict(chat: Chat):
+def chat_to_block_dict(chat: Chat):
     name = chat.name if chat.isGroup else [
         i for i in chat.users if i.username != current_user.username][0].username
     return {
@@ -42,10 +42,10 @@ def chat_to_blockdict(chat: Chat):
             if chat.messages else
             {"text": "no messages",
              "author": "", },
-        "url": chat.id if chat.isGroup else name,
-        "isGroup": chat.isGroup,
+        "url": chat.id if chat.is_group else name,
+        "isGroup": chat.is_group,
         "lastUpdate": chat.last_time,
-        "isUnread": current_user in chat.messages[-1].unreadby if chat.messages else False,
+        "isUnread": current_user in chat.messages[-1].unread_by if chat.messages else False,
     }
 
 
@@ -55,9 +55,9 @@ def chat_to_dict(chat: Chat):
     return {
         "id": chat.id,
         "name": name,
-        "isGroup": chat.isGroup,
+        "isGroup": chat.is_group,
         "lastUpdate": chat.last_time,
-        "isUnread": current_user in chat.messages[-1].unreadby if chat.messages else False,
+        "isUnread": current_user in chat.messages[-1].unread_by if chat.messages else False,
     }
 
 
@@ -70,7 +70,7 @@ def getChats():
         chats.sort(
             key=lambda chat: chat.last_time, reverse=True)
     if chats and chats[0].last_time > datetime.utcfromtimestamp(data['lastUpdate']):
-        return {"status": True, "data": [chat_to_blockdict(chat) for chat in chats], "time": time.mktime(chats[0].last_time.timetuple())}
+        return {"status": True, "data": [chat_to_block_dict(chat) for chat in chats], "time": time.mktime(chats[0].last_time.timetuple())}
     return {"status": False}
 
 
