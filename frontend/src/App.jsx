@@ -27,7 +27,10 @@ export default function App() {
   useEffect(() => {
     setTrueVH();
     DetectTheme();
-    fetch("/api/u/get_current_user")
+    fetchUser();
+  }, []);
+  const fetchUser = async () => {
+    await fetch("/api/u/get_current_user")
       .then((res) => {
         if (res.status != "200") {
           return undefined;
@@ -41,11 +44,11 @@ export default function App() {
           setIsLoader(false);
         }
       });
-  }, []);
+  };
   return (
     <TranslationContext.Provider value={{ t, i18n }}>
-      <AuthContext.Provider value={user}>
-        <LoaderContext.Provider value={[isLoader, setIsLoader]}>
+      <AuthContext.Provider value={{ user, setUser, fetchUser }}>
+        <LoaderContext.Provider value={{ isLoader, setIsLoader }}>
           <MenuContext.Provider value={{ menu, setMenu }}>
             <BrowserRouter>
               <Routes>

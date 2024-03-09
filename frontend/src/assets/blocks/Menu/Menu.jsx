@@ -1,10 +1,11 @@
 import React, { useContext } from "react";
 import { BiSolidAddToQueue, BiSolidChat, BiSolidLogIn } from "react-icons/bi";
 import { Link } from "react-router-dom";
-import { TranslationContext } from "../../contexts/contexts";
+import { AuthContext, TranslationContext } from "../../contexts/contexts";
 
-export default function Menu({ isOnTop, user, switchMenu }) {
+export default function Menu({ isOnTop, switchMenu }) {
   const { t } = useContext(TranslationContext);
+  const { user } = useContext(AuthContext);
 
   return (
     <div

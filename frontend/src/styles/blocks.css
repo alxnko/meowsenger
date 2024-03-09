@@ -16,6 +16,11 @@ blocks
   display: flex;
   justify-content: center;
 }
+.fl-cn-cl {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
 .full-bg {
   min-height: calc(100 * var(--vh) - 3px);
   top: 0;

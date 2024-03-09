@@ -31,7 +31,7 @@ def messages_to_arr(chat, frm=1, to=50):
 
 
 def chat_to_block_dict(chat: Chat):
-    name = chat.name if chat.isGroup else [
+    name = chat.name if chat.is_group else current_user.username if len(chat.users) == 1 else [
         i for i in chat.users if i.username != current_user.username][0].username
     return {
         "id": chat.id,
@@ -45,19 +45,20 @@ def chat_to_block_dict(chat: Chat):
         "url": chat.id if chat.is_group else name,
         "isGroup": chat.is_group,
         "lastUpdate": chat.last_time,
-        "isUnread": current_user in chat.messages[-1].unread_by if chat.messages else False,
+        "isUnread": (current_user in chat.messages[-1].unread_by) if chat.messages else False,
     }
 
 
 def chat_to_dict(chat: Chat):
-    name = chat.name if chat.isGroup else [
+    name = chat.name if chat.is_group else current_user.username if len(chat.users) == 1 else [
         i for i in chat.users if i.username != current_user.username][0].username
     return {
         "id": chat.id,
         "name": name,
+        "users": [{"username": i.username} for i in chat.users if i.username != current_user.username] if len(chat.users) != 1 else [{"username": current_user.username}],
         "isGroup": chat.is_group,
         "lastUpdate": chat.last_time,
-        "isUnread": current_user in chat.messages[-1].unread_by if chat.messages else False,
+        "isUnread": (current_user in chat.messages[-1].unread_by) if chat.messages else False,
     }
 
 
@@ -78,17 +79,29 @@ def getChats():
 @login_required
 def getChat():
     data = request.json
-    user = User.query.filter_by(username=data['username'])
+    user = User.query.filter_by(username=data['from']).first()
     if user:
-        for chat in current_user.chats:
-            if not chat.isGroup and user in chat.users:
-                return {"status": True, "chat": chat_to_dict(chat), "messages": []}
-        chat = Chat()
-        chat.users.append(user)
-        chat.users.append(current_user)
-        db.session.add(chat)
-        db.session.commit()
-        mark_as_read(chat)
-        db.session.commit()
-        return {"status": True, "chat": chat_to_dict(chat), "messages": messages_to_arr(chat)}
+        if user == current_user:
+            for chat in current_user.chats:
+                if not chat.is_group and len(chat.users) == 1:
+                    return {"status": True, "chat": chat_to_dict(chat), "messages": messages_to_arr(chat)}
+            chat = Chat()
+            chat.users.append(user)
+            db.session.add(chat)
+            db.session.commit()
+            mark_as_read(chat)
+            db.session.commit()
+            return {"status": True, "chat": chat_to_dict(chat), "messages": messages_to_arr(chat)}
+        else:
+            for chat in current_user.chats:
+                if not chat.is_group and user in chat.users:
+                    return {"status": True, "chat": chat_to_dict(chat), "messages": []}
+            chat = Chat()
+            chat.users.append(user)
+            chat.users.append(current_user)
+            db.session.add(chat)
+            db.session.commit()
+            mark_as_read(chat)
+            db.session.commit()
+            return {"status": True, "chat": chat_to_dict(chat), "messages": messages_to_arr(chat)}
     return {"status": False}, 404

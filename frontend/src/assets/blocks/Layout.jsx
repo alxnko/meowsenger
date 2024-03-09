@@ -6,8 +6,7 @@ import Menu from "./Menu/Menu";
 import SubMenu from "./Menu/SubMenu";
 
 export default function Layout() {
-  const user = useContext(AuthContext);
-  const [isLoader] = useContext(LoaderContext);
+  const { isLoader } = useContext(LoaderContext);
   const [isMenuOpen, openMenu] = useState(false);
   const [isOnTop, setOnTop] = useState(window.location.href.includes("/chat/"));
   const navigate = useNavigate();
@@ -28,7 +27,7 @@ export default function Layout() {
     <>
       <SubMenu isOnTop={isOnTop} show={isMenuOpen} openMenu={openMenu} />
       <Loader show={isLoader} />
-      <Menu isOnTop={isOnTop} user={user} switchMenu={switchMenu} />
+      <Menu isOnTop={isOnTop} switchMenu={switchMenu} />
       <main>
         <div className="content">
           <Outlet />

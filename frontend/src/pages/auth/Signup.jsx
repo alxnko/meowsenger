@@ -1,18 +1,22 @@
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import IsNotAuth from "../../assets/blocks/Auth/IsNotAuth";
-import { TranslationContext } from "../../assets/contexts/contexts";
+import {
+  AuthContext,
+  TranslationContext,
+} from "../../assets/contexts/contexts";
 import { createPostData } from "../../assets/scripts/createPostData";
 
 export default function Signup() {
   const navigate = useNavigate();
+  const { fetchUser } = useContext(AuthContext);
   const { t } = useContext(TranslationContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const [error, setError] = useState("");
   const handleUsername = (e) => {
-    setUsername(e.target.value.trim());
+    setUsername(e.target.value.replace(/\s/g, ""));
   };
   const regMe = (e) => {
     e.preventDefault();
@@ -28,9 +32,10 @@ export default function Signup() {
           }
           return res.json();
         })
-        .then((data) => {
+        .then(async (data) => {
           if (data) {
             if (data.status) {
+              await fetchUser();
               navigate("/chats");
             } else setError(t("unauth"));
           }
@@ -47,14 +52,16 @@ export default function Signup() {
       <input
         id="username"
         type="username"
+        autoComplete="username"
         value={username}
         onChange={handleUsername}
       />
       <label htmlFor="password">{t("password")}</label>
       <input
         id="password"
-        value={password}
         type="password"
+        autoComplete="new-password"
+        value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
       <label htmlFor="password2">
@@ -63,6 +70,7 @@ export default function Signup() {
       <input
         id="password2"
         type="password"
+        autocomplete="new-password"
         value={password2}
         onChange={(e) => setPassword2(e.target.value)}
       />

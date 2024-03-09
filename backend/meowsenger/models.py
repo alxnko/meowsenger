@@ -32,7 +32,7 @@ class User(db.Model, UserMixin):
     chats = db.relationship("Chat", secondary='user_chat',
                             lazy='subquery', back_populates="users")
     unread = db.relationship("Message", secondary='user_message',
-                             lazy='subquery', back_populates="unreadby")
+                             lazy='subquery', back_populates="unread_by")
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"

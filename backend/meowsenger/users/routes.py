@@ -50,10 +50,15 @@ def login():
         return {"status": True}
     return {"status": False}, 401
 
+@users.route("/api/u/logout")
+def logout():
+    if current_user:
+        logout_user()
+        return {"status": True}
+    return {"status": False}
+
 
 @users.route("/api/u/has_user/<username>", methods=['GET'])
 def hasUser(username):
-    if current_user.is_authenticated and username == current_user.username:
-        return "False"
-    user = User.query.filter_by(username=username)
-    return "True" if user.first() else "False"
+    user = User.query.filter_by(username=username).first()
+    return {"status": True} if user else {"status": False}

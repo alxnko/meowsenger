@@ -7,19 +7,25 @@ import {
   TranslationContext,
 } from "../../assets/contexts/contexts";
 import { createPostData } from "../../assets/scripts/createPostData";
+import PopUp from "../../assets/blocks/PopUps/PopUp";
+import NewChat from "../../assets/blocks/Chats/NewChat";
 
 export default function Chats() {
-  const { t } = useContext(TranslationContext);
-  const user = useContext(AuthContext);
-  const [isLoader, setIsLoader] = useContext(LoaderContext);
   let lastUpdate = 0;
   const [chats, setChats] = useState(undefined);
+  const { t } = useContext(TranslationContext);
+  const { setIsLoader } = useContext(LoaderContext);
+
+  const [isNewChatOpen, setIsNewChatOpen] = useState(false);
+
   useEffect(() => {
+    setIsLoader(true);
     const interval = setInterval(async () => {
       fetchData();
     }, 500);
     return () => clearInterval(interval);
   }, []);
+
   const fetchData = async () => {
     await fetch("/api/c/get_chats", createPostData({ lastUpdate: lastUpdate }))
       .then((res) => {
@@ -41,18 +47,27 @@ export default function Chats() {
           setChats(data.data);
         }
         lastUpdate = parseInt(data.time);
+        setIsLoader(false);
       }
-      setIsLoader(false);
     }
   };
+
   return (
     <div>
       <IsAuth />
+      <NewChat show={isNewChatOpen} setIsShow={setIsNewChatOpen} />
       <p>{t("chatlist")}</p>
       <div>
         <div className="chats">
           <div className="flex">
-            <button className="chat-prev">{t("newchat")}</button>
+            <button
+              onClick={() => {
+                setIsNewChatOpen(true);
+              }}
+              className="chat-prev"
+            >
+              {t("newchat")}
+            </button>
             <button style={{ marginLeft: 10 }} className="chat-prev">
               {t("newgroup")}
             </button>
@@ -62,7 +77,7 @@ export default function Chats() {
               ? chats.map((chat) => (
                   <ChatBlock key={chat.id} chatdata={chat} ref={createRef()} />
                 ))
-              : setIsLoader(true)}
+              : ""}
           </div>
         </div>
       </div>

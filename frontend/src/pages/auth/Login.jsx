@@ -1,17 +1,21 @@
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import IsNotAuth from "../../assets/blocks/Auth/IsNotAuth";
-import { TranslationContext } from "../../assets/contexts/contexts";
+import {
+  AuthContext,
+  TranslationContext,
+} from "../../assets/contexts/contexts";
 import { createPostData } from "../../assets/scripts/createPostData";
 
 export default function Login() {
   const { t } = useContext(TranslationContext);
+  const { fetchUser } = useContext(AuthContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const handleUsername = (e) => {
-    setUsername(e.target.value.trim());
+    setUsername(e.target.value.replace(/\s/g, ""));
   };
   const logMe = async (e) => {
     e.preventDefault();
@@ -26,8 +30,9 @@ export default function Login() {
           }
           return res.json();
         })
-        .then((data) => {
+        .then(async (data) => {
           if (data.status) {
+            await fetchUser();
             navigate("/chats");
           } else setError(t("unauth"));
         });
@@ -41,8 +46,9 @@ export default function Login() {
       <h1>{t("login")}</h1>
       <label htmlFor="username">{t("username")}</label>
       <input
-        type="username"
         id="username"
+        type="username"
+        autoComplete="username"
         value={username}
         onChange={handleUsername}
       />
@@ -50,6 +56,7 @@ export default function Login() {
       <input
         id="password"
         type="password"
+        autoComplete="current-password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />

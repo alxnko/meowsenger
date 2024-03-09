@@ -19,14 +19,31 @@ import PopUp from "../PopUps/PopUp";
 import UserBlock from "../Users/UserBlock";
 
 export default function SubMenu({ isOnTop, show, openMenu }) {
-  const { i18n, t } = useContext(TranslationContext);
+  const { t } = useContext(TranslationContext);
   const navigate = useNavigate();
+  const { fetchUser } = useContext(AuthContext);
   const [isLang, SetIsLang] = useState(false);
   const { menu } = useContext(MenuContext);
   useEffect(() => {
     hideMe(openMenu);
   }, [navigate]);
-  const user = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
+
+  const logout = () => {
+    fetch("/api/u/logout")
+      .then((res) => {
+        if (res.status != "200") {
+          return { status: false };
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (data.status) {
+          fetchUser();
+          navigate("/login");
+        }
+      });
+  };
   return (
     <>
       <PopUp show={isLang} setIsShow={SetIsLang}>
@@ -88,15 +105,7 @@ export default function SubMenu({ isOnTop, show, openMenu }) {
             }}
             className="flex"
           >
-            <div className="flex">
-              {user != "unAuth" ? (
-                <button>
-                  <BiSolidMessageAdd />
-                </button>
-              ) : (
-                ""
-              )}
-            </div>
+            <div className="flex"></div>
             <div className="flex">
               <button
                 onClick={() => {
@@ -112,7 +121,7 @@ export default function SubMenu({ isOnTop, show, openMenu }) {
                 <BiSolidMoon />
               </button>
               {user != "unAuth" ? (
-                <button>
+                <button onClick={logout}>
                   <BiSolidLogOut />
                 </button>
               ) : (
