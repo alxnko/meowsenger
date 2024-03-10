@@ -31,6 +31,8 @@ class User(db.Model, UserMixin):
                          default=datetime.now)
     chats = db.relationship("Chat", secondary='user_chat',
                             lazy='subquery', back_populates="users")
+    manage = db.relationship("Chat", secondary='admin_chat',
+                             lazy='subquery', back_populates="admins")
     unread = db.relationship("Message", secondary='user_message',
                              lazy='subquery', back_populates="unread_by")
 
@@ -45,6 +47,8 @@ class Chat(db.Model):
     messages = db.relationship('Message', backref='chat', lazy=True)
     users = db.relationship("User", secondary='user_chat',
                             lazy='subquery', back_populates="chats")
+    admins = db.relationship("User", secondary='admin_chat',
+                             lazy='subquery', back_populates="manage")
     last_time = db.Column(db.DateTime, nullable=False,
                           default=datetime.now)
 
@@ -60,11 +64,17 @@ class Message(db.Model):
     reply_to = db.Column(db.Integer, db.ForeignKey('message.id'))
     is_forwarded = db.Column(db.Boolean, default=False)
     unread_by = db.relationship("User", secondary='user_message',
-                               lazy='subquery', back_populates="unread")
+                                lazy='subquery', back_populates="unread")
 
 
 user_chat = db.Table(
     'user_chat',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('chat_id', db.Integer, db.ForeignKey('chat.id'))
+)
+
+admin_chat = db.Table(
+    'admin_chat',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
     db.Column('chat_id', db.Integer, db.ForeignKey('chat.id'))
 )
