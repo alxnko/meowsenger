@@ -5,10 +5,13 @@
 @import "./styles/menu.css";
 @import "./styles/loader.css";
 @import "./styles/popup.css";
+@import "./styles/tooltip.css";
 
+@import "./styles/scrollbar.css";
 @import "./styles/text.css";
 @import "./styles/forms.css";
 @import "./styles/buttons.css";
+@import "./styles/images.css";
 @import "./styles/blocks.css";
 
 :root {
@@ -28,7 +31,8 @@
   --bluecolor: #5964ff;
 }
 
-.light-mode {
+.light-mode,
+body[class] {
   --bgcolor: aliceblue;
   --hovercolor: rgb(45, 45, 45);
   --simplecolor: #dceeff;

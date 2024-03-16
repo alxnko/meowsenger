@@ -1,10 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import {
-  BiSolidLogOut,
-  BiSolidMessageAdd,
-  BiSolidMoon,
-  BiSolidSun,
-} from "react-icons/bi";
+import { BiSolidLogOut, BiSolidMoon, BiSolidSun } from "react-icons/bi";
 import { FaLanguage } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import {
@@ -53,14 +48,25 @@ export default function SubMenu({ isOnTop, show, openMenu }) {
           onClick={() => {
             setLang("en");
             SetIsLang(false);
+            openMenu(false);
           }}
         >
           English
         </button>
+        {/* <button
+          onClick={() => {
+            setLang("kg");
+            SetIsLang(false);
+            openMenu(false);
+          }}
+        >
+          Кыргызча
+        </button> */}
         <button
           onClick={() => {
             setLang("ru");
             SetIsLang(false);
+            openMenu(false);
           }}
         >
           Русский

@@ -7,7 +7,7 @@ export default function IsNotAuth() {
   const { user } = useContext(AuthContext);
   useEffect(() => {
     if (user && user != "unAuth") {
-      navigate("/login");
+      navigate("/chats");
     }
   }, [user]);
   return <></>;

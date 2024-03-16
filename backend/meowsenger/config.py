@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 
 # load_dotenv(dotenv_path=Path('meowsenger/.env'))
-load_dotenv(dotenv_path=Path('backend/meowsenger/.env'))
+load_dotenv(dotenv_path=Path('backend/.env'))
 
 
 class Config:

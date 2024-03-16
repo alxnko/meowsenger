@@ -1,0 +1,11 @@
+.react-tooltip {
+  z-index: 9999;
+  border: 1px solid var(--greencolor);
+  background: var(--reversepcolor) !important;
+  color: var(--hovercolor) !important;
+}
+.react-tooltip-arrow {
+  border: 1px solid var(--greencolor);
+  border-top: 0;
+  border-left: 0;
+}

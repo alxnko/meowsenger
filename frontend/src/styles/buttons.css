@@ -32,3 +32,7 @@ input[type="submit"].reverse:hover {
   background-color: var(--bgcolor);
   color: var(--pcolor);
 }
+a.active button {
+  background-color: var(--greencolor);
+  color: var(--reversepcolor);
+}

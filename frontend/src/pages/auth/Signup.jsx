@@ -20,7 +20,12 @@ export default function Signup() {
   };
   const regMe = (e) => {
     e.preventDefault();
-    if (username.length > 2 && password == password2 && password.length > 7) {
+    if (
+      username.length > 2 &&
+      username.length < 16 &&
+      password == password2 &&
+      password.length > 7
+    ) {
       fetch(
         "/api/u/register",
         createPostData({ username: username, password: password })
@@ -53,6 +58,7 @@ export default function Signup() {
         id="username"
         type="username"
         autoComplete="username"
+        placeholder={t("usernamelimit")}
         value={username}
         onChange={handleUsername}
       />
@@ -61,6 +67,7 @@ export default function Signup() {
         id="password"
         type="password"
         autoComplete="new-password"
+        placeholder={t("min8")}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
@@ -70,7 +77,7 @@ export default function Signup() {
       <input
         id="password2"
         type="password"
-        autocomplete="new-password"
+        autoComplete="new-password"
         value={password2}
         onChange={(e) => setPassword2(e.target.value)}
       />

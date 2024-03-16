@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { BiSolidAddToQueue, BiSolidChat, BiSolidLogIn } from "react-icons/bi";
 import { Link } from "react-router-dom";
+import { Tooltip } from "react-tooltip";
 import { AuthContext, TranslationContext } from "../../contexts/contexts";
 
 export default function Menu({ isOnTop, switchMenu }) {
@@ -25,11 +26,13 @@ export default function Menu({ isOnTop, switchMenu }) {
           </button>
         </Link>
       )}
+      <Tooltip id="admin-tooltip" />
+      <Tooltip id="verified-tooltip" />
       <button onClick={switchMenu} className="logo-btn">
         <img className="logo" src="/static/catuser.png" alt="logo" />
       </button>
       {user != "unAuth" ? (
-        <Link to="/me">
+        <Link to={user ? "/user/" + user.username : ""}>
           <button>{t("me")}</button>
         </Link>
       ) : (

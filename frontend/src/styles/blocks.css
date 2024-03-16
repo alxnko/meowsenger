@@ -6,15 +6,37 @@ blocks
   background-color: var(--simplecolor);
   border-radius: 30px;
 }
+.fwc {
+  left: 50%;
+  transform: translateX(-50%);
+}
+.fw {
+  width: 100vw;
+  max-width: 450px;
+}
+.wa {
+  width: auto;
+}
+.w4 {
+  width: 80px;
+}
 .container {
   display: flex;
 }
 .flex {
   display: flex;
 }
+.data {
+  flex-direction: column;
+  justify-content: center;
+}
 .flex-center {
   display: flex;
   justify-content: center;
+}
+.flsb {
+  display: flex;
+  justify-content: space-between;
 }
 .fl-cn-cl {
   display: flex;

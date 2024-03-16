@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from meowsenger import db, login_manager
 from flask_login import UserMixin
+import secrets
 
 
 @login_manager.user_loader
@@ -22,9 +23,12 @@ def load_user(user_id):
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
+    description = db.Column(db.String(20), default="default")
     image_file = db.Column(db.String(20), nullable=False,
                            default='default')
     rank = db.Column(db.String(20))
+    is_verified = db.Column(db.Boolean, default=False)
+    is_admin = db.Column(db.Boolean, default=False)
     password = db.Column(db.String(60), nullable=False)
     messages = db.relationship('Message', backref='author', lazy=True)
     reg_time = db.Column(db.DateTime, nullable=False,
@@ -49,6 +53,8 @@ class Chat(db.Model):
                             lazy='subquery', back_populates="chats")
     admins = db.relationship("User", secondary='admin_chat',
                              lazy='subquery', back_populates="manage")
+    is_verified = db.Column(db.Boolean, default=False)
+    secret = db.Column(db.String(64), default=secrets.token_hex(16))
     last_time = db.Column(db.DateTime, nullable=False,
                           default=datetime.now)
 
@@ -57,6 +63,7 @@ class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.Text, nullable=False)
     is_deleted = db.Column(db.Boolean, default=False)
+    is_system = db.Column(db.Boolean, default=False)
     send_time = db.Column(db.DateTime, nullable=False,
                           default=datetime.now)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

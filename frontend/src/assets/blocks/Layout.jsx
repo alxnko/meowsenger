@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { AuthContext, LoaderContext } from "../contexts/contexts";
+import { LoaderContext } from "../contexts/contexts";
 import Loader from "./Loader/Loader";
 import Menu from "./Menu/Menu";
 import SubMenu from "./Menu/SubMenu";

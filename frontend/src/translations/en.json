@@ -5,21 +5,66 @@
   "password": "passwords",
   "confirm": "confirm",
 
+  "min8": "more than 8 characters",
+  "usernamelimit": "from 3 to 16 characters",
+  "max20": "less than 20 characters",
+
+  "securitypassword": "enter your account password to confirm",
+
   "baddata": "fields are empty or filled in incorrectly",
   "unauth": "authorization failed, check your username and password",
   "takenusername": "username is already taken",
+  "nouser": "user is not found",
 
   "error404": "error 404",
+  "unknownerror": "unknown error",
 
   "chatlist": "chat list",
+
+  "createnew": "create new...",
   "newchat": "new chat",
   "newgroup": "new group",
+  "newchannel": "new channel",
+
+  "groupname": "group name",
+  "channelname": "channel name",
+
+  "start": "start",
+
+  "you": "you",
+
+  "openchat": "open chat",
+
+  "chat": "chat",
   "with": "with",
+
+  "members": "members",
+  "addmember": "add member",
+
+  "createdgroup": "created group",
+  "added": "added",
+  "removed": "removed",
+  "gaveadminrightsto": "gave admin rights to",
+  "tookawayadminrightsfrom": "removed admin rights from",
+  "leftgroup": "left group",
+
+  "message": "message",
+
+  "copy": "copy",
 
   "nomessages": "no messages",
   "startchatting": "start chatting",
 
   "lang": "language",
   "loading": "loading",
-  "testdesc": "meowsenger is great"
+  "testdesc": "meowsenger is great",
+
+  "admin": "admin",
+  "verified": "verified",
+
+  "settings": "settings",
+
+  "deletegroup": "delete group",
+
+  "description": "description"
 }

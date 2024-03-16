@@ -10,7 +10,11 @@ export function DetectTheme() {
   CheckTheme();
 }
 export function SwitchTheme() {
-  document.body.classList.toggle("light-mode");
+  if (document.body.hasAttribute("class")) {
+    document.body.removeAttribute("class");
+  } else {
+    document.body.classList.toggle("light-mode");
+  }
   CheckTheme(true);
 }
 function CheckTheme(set = false) {

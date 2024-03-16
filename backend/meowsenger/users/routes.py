@@ -4,7 +4,7 @@ from meowsenger.models import Chat, User, Message
 # from meowsenger.main.routes import mark_as_read
 from meowsenger import db, bcrypt
 
-users = Blueprint('users', __name__)
+users = Blueprint("users", __name__)
 
 
 def user_to_dict(user: User):
@@ -12,7 +12,10 @@ def user_to_dict(user: User):
         "id": user.id,
         "username": user.username,
         "rank": user.rank,
-        "image_file": user.image_file,
+        "desc": user.description,
+        "isAdmin": user.is_admin,
+        "isVerified": user.is_verified,
+        "imageFile": user.image_file,
     }
 
 
@@ -21,17 +24,17 @@ def get_current_user():
     return user_to_dict(current_user) if current_user.is_authenticated else {"error": "notAuth"}
 
 
-@users.route("/api/u/register", methods=['POST'])
+@users.route("/api/u/register", methods=["POST"])
 def register():
     data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
+    username = data.get("username")
+    password = data.get("password")
     if (len(username) < 3 or len(password) < 8):
         return {"status": False, "reason": "len"}, 403
     u = User.query.filter_by(username=username).first()
     if u:
         return {"status": False, "reason": "username"}, 422
-    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+    hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
     user = User(username=username, password=hashed_password)
     db.session.add(user)
     db.session.commit()
@@ -39,16 +42,17 @@ def register():
     return {"status": True}
 
 
-@users.route("/api/u/login", methods=['POST'])
+@users.route("/api/u/login", methods=["POST"])
 def login():
     data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
+    username = data.get("username")
+    password = data.get("password")
     user = User.query.filter_by(username=username).first()
     if user and bcrypt.check_password_hash(user.password, password):
         login_user(user, remember=True)
         return {"status": True}
     return {"status": False}, 401
+
 
 @users.route("/api/u/logout")
 def logout():
@@ -58,7 +62,27 @@ def logout():
     return {"status": False}
 
 
-@users.route("/api/u/has_user/<username>", methods=['GET'])
+@users.route("/api/u/has_user/<username>", methods=["GET"])
 def hasUser(username):
     user = User.query.filter_by(username=username).first()
     return {"status": True} if user else {"status": False}
+
+
+@users.route("/api/u/get_user/<username>", methods=["GET"])
+@login_required
+def getUser(username):
+    user = User.query.filter_by(username=username).first()
+    return {"status": True, "user": user_to_dict(user)} if user else {"status": False}
+
+
+@users.route("/api/u/save_settings", methods=["POST"])
+@login_required
+def saveSettings():
+    data = request.get_json()
+    user = User.query.filter_by(username=current_user.username).first()
+    print(data)
+    if "description" in data:
+        user.description = data["description"]
+    db.session.add(user)
+    db.session.commit()
+    return {"status": True}

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import "./App.css";
 import Layout from "./assets/blocks/Layout";
 import {
   AuthContext,
@@ -18,6 +17,8 @@ import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import Chat from "./pages/chats/Chat";
 import Chats from "./pages/chats/Chats";
+import SettingsPage from "./pages/user/SettingsPage";
+import UserPage from "./pages/user/UserPage";
 
 export default function App() {
   const { i18n, t } = useTranslation();
@@ -57,8 +58,11 @@ export default function App() {
                   <Route path="login" element={<Login />} />
                   <Route path="signup" element={<Signup />} />
                   <Route path="chats" element={<Chats />} />
+                  <Route path="chats/:type" element={<Chats />} />
                   <Route path="chat/:username" element={<Chat />} />
-                  <Route path="group/:groupid" element={<Chat />} />
+                  <Route path="group/:groupId" element={<Chat />} />
+                  <Route path="user/:username" element={<UserPage />} />
+                  <Route path="settings" element={<SettingsPage />} />
                   <Route path="*" element={<NoPage />} />
                 </Route>
               </Routes>

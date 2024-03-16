@@ -5,21 +5,66 @@
   "password": "пароль",
   "confirm": "подтвердите",
 
+  "min8": "от 8 символов",
+  "usernamelimit": "от 3 до 16 символов",
+  "max20": "до 20 символов",
+
+  "securitypassword": "введите пароль своего аккаунта для подтверждения",
+
   "baddata": "поля пусты или заполнены неверно",
   "unauth": "авторизация не удалась, проверьте имя пользователя и пароль",
   "takenusername": "имя пользователя уже занято",
+  "nouser": "пользователь не найден",
 
   "error404": "ошибка 404",
+  "unknownerror": "неизвестная ошибка",
 
   "chatlist": "список чатов",
+
+  "createnew": "создать новый...",
   "newchat": "новый чат",
   "newgroup": "новая группа",
+  "newchannel": "новый канал",
+
+  "groupname": "название группы",
+  "channelname": "название канала",
+
+  "start": "начать",
+
+  "you": "вы",
+
+  "openchat": "открыть чат",
+
+  "chat": "чат",
   "with": "с",
+
+  "members": "участникoв",
+  "addmember": "добавить участника",
+
+  "createdgroup": "создал группу",
+  "added": "добавил",
+  "removed": "удалил",
+  "leftgroup": "покинул группу",
+
+  "message": "сообщение",
+
+  "copy": "копировать",
 
   "nomessages": "нет сообщений",
   "startchatting": "начните общение",
 
   "lang": "язык",
   "loading": "загрузка",
-  "testdesc": "meowsenger классный"
+  "gaveadminrightsto": "дал права админа",
+  "tookawayadminrightsfrom": "забрал права админа у",
+  "testdesc": "meowsenger классный",
+
+  "admin": "админ",
+  "verified": "подтвержден",
+
+  "settings": "настройки",
+
+  "deletegroup": "удалить группу",
+
+  "description": "описание"
 }
