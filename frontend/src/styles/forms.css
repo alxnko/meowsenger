@@ -1,7 +1,6 @@
 /*
 forms
 */
-input,
 textarea {
   width: 100%;
   margin: 5px 0;
@@ -10,5 +9,16 @@ textarea {
   color: var(--pcolor);
   border: none;
   border-bottom: var(--greencolor) solid 1px;
+  font-size: 24px;
+}
+
+input {
+  width: 95%;
+  margin: 5px 0;
+  background-color: var(--blurcolor);
+  padding: 5px 10px;
+  color: var(--pcolor);
+  border: none;
+  border-radius: 5px;
   font-size: 24px;
 }

@@ -53,15 +53,19 @@ export default function SubMenu({ isOnTop, show, openMenu }) {
         >
           English
         </button>
-        {/* <button
-          onClick={() => {
-            setLang("kg");
-            SetIsLang(false);
-            openMenu(false);
-          }}
-        >
-          Кыргызча
-        </button> */}
+        {user && user.isTester ? (
+          <button
+            onClick={() => {
+              setLang("kg");
+              SetIsLang(false);
+              openMenu(false);
+            }}
+          >
+            Кыргызча
+          </button>
+        ) : (
+          ""
+        )}
         <button
           onClick={() => {
             setLang("ru");

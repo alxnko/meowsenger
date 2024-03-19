@@ -52,7 +52,7 @@ export default function Signup() {
   return (
     <form onClick={regMe}>
       <IsNotAuth />
-      <h1>{t("signup")}</h1>
+      <h1 className="center">{t("signup")}</h1>
       <label htmlFor="username">{t("username")}</label>
       <input
         id="username"

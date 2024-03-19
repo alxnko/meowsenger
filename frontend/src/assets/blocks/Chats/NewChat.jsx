@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
-import PopUp from "../PopUps/PopUp";
-import { TranslationContext } from "../../contexts/contexts";
 import { useNavigate } from "react-router-dom";
+import { TranslationContext } from "../../contexts/contexts";
+import PopUp from "../PopUps/PopUp";
 
 export default function NewChat({ show, setIsShow }) {
   const { t } = useContext(TranslationContext);
@@ -34,9 +34,7 @@ export default function NewChat({ show, setIsShow }) {
   return (
     <PopUp show={show} setIsShow={setIsShow}>
       <form className="fl-cn-cl" onSubmit={newChat}>
-        <h2>
-          {t("newchat")} {t("with")}
-        </h2>
+        <h2 className="center">{t("chatwith")}</h2>
         <input
           value={username}
           onChange={handleUsername}

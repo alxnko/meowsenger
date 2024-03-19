@@ -30,6 +30,9 @@ export default function App() {
     DetectTheme();
     fetchUser();
   }, []);
+  const ts = (key, ...args) => {
+    return t(key).format(args);
+  };
   const fetchUser = async () => {
     await fetch("/api/u/get_current_user")
       .then((res) => {
@@ -47,7 +50,7 @@ export default function App() {
       });
   };
   return (
-    <TranslationContext.Provider value={{ t, i18n }}>
+    <TranslationContext.Provider value={{ t, ts, i18n }}>
       <AuthContext.Provider value={{ user, setUser, fetchUser }}>
         <LoaderContext.Provider value={{ isLoader, setIsLoader }}>
           <MenuContext.Provider value={{ menu, setMenu }}>
@@ -58,7 +61,6 @@ export default function App() {
                   <Route path="login" element={<Login />} />
                   <Route path="signup" element={<Signup />} />
                   <Route path="chats" element={<Chats />} />
-                  <Route path="chats/:type" element={<Chats />} />
                   <Route path="chat/:username" element={<Chat />} />
                   <Route path="group/:groupId" element={<Chat />} />
                   <Route path="user/:username" element={<UserPage />} />

@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import IsAuth from "../../assets/blocks/Auth/IsAuth";
+import ChatList from "../../assets/blocks/Chats/ChatList";
 import GroupBlock from "../../assets/blocks/Chats/GroupBlock";
 import Message from "../../assets/blocks/Messages/Message";
 import MessageInput from "../../assets/blocks/Messages/MessageInput";
@@ -11,6 +12,8 @@ import {
   VerifiedBadge,
 } from "../../assets/blocks/Users/UserBadges";
 import UserBlock from "../../assets/blocks/Users/UserBlock";
+import { useInterval } from "../../assets/blocks/hooks/useInterval";
+import useOnScreen from "../../assets/blocks/hooks/useOnScreen";
 import {
   AuthContext,
   LoaderContext,
@@ -19,6 +22,7 @@ import {
 } from "../../assets/contexts/contexts";
 import { createPostData } from "../../assets/scripts/createPostData";
 import { decrypt, encrypt } from "../../assets/scripts/encryption";
+import { toLocalTime } from "../../assets/scripts/time";
 
 export default function Chat() {
   const navigate = useNavigate();
@@ -32,8 +36,12 @@ export default function Chat() {
   const [chat, setChat] = useState(undefined);
   let chatId = undefined;
   const [messages, setMessages] = useState(undefined);
-  let last = undefined;
+  const [last, setLast] = useState(undefined);
+
   const scrollTo = useRef(null);
+
+  const topMessage = useRef(null);
+  const isTopMessageVisible = useOnScreen(topMessage);
 
   const [isMsgMenuOpen, setMsgMenuOpen] = useState(false);
   const [currentMsg, setCurrentMsg] = useState(undefined);
@@ -44,12 +52,71 @@ export default function Chat() {
   const [isUserListOpen, setUserListOpen] = useState(false);
   const [isAdminPanelOpen, setAdminPanelOpen] = useState(false);
 
+  const [groupName, setGroupName] = useState(undefined);
+  const [groupDesc, setGroupDesc] = useState(undefined);
+
+  const [replyMsg, setReplyMsg] = useState(undefined);
+
+  const [isFirst, setIsFirst] = useState(true);
+
   const [isAddUserOpen, setAddUserOpen] = useState(false);
   const [newUsername, setNewUsername] = useState("");
   const [error, setError] = useState("");
 
   const [isDeleteGroupOpen, setDeleteGroupOpen] = useState(false);
   const [password, setPassword] = useState("");
+
+  const [scroll, setScroll] = useState(document.body.scrollHeight);
+
+  const [isForwardMenuOpen, setForwardMenuOpen] = useState("");
+  const [chats, setChats] = useState(undefined);
+
+  const [isEdit, setEdit] = useState(false);
+
+  const [isDeleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+
+  const fetchChats = async () => {
+    await fetch("/api/c/get_chats", createPostData({ lastUpdate: 0, chats: 0 }))
+      .then((res) => {
+        if (res.status != "200") {
+          setIsLoader(true);
+          return [];
+        }
+        setIsLoader(false);
+        return res.json();
+      })
+      .then((data) => {
+        setData(data);
+      });
+  };
+  const setData = (data) => {
+    if (data) {
+      if (data.status) {
+        if ("data" in data) {
+          setChats(data.data);
+        }
+        setIsLoader(false);
+      }
+    }
+  };
+
+  const forward = (id, secret) => {
+    sendMessage(decrypt(currentMsg.text, chat.secret), id, secret, true);
+    setForwardMenuOpen(false);
+  };
+
+  const editMessage = (text) => {
+    fetch(
+      "/api/m/edit",
+      createPostData({ id: currentMsg.id, text: encrypt(text, chat.secret) })
+    );
+    setEdit(false);
+  };
+
+  const deleteMessage = () => {
+    fetch("/api/m/delete", createPostData({ id: currentMsg.id }));
+    setDeleteConfirmOpen(false);
+  };
 
   const handleNewUsername = (e) => {
     setNewUsername(e.target.value.replace(/\s/g, ""));
@@ -64,20 +131,7 @@ export default function Chat() {
         username: newUsername,
         message: encrypt("added " + newUsername, chat.secret),
       })
-    )
-      .then((res) => {
-        if (res.status != "200") {
-          return { status: false };
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (data.status) {
-          setAddUserOpen(false);
-          setNewUsername("");
-          fetchChat();
-        } else setError(t("nouser"));
-      });
+    );
   };
 
   const removeUser = (un) => {
@@ -88,18 +142,7 @@ export default function Chat() {
         username: un,
         message: encrypt("removed " + un, chat.secret),
       })
-    )
-      .then((res) => {
-        if (res.status != "200") {
-          return { status: false };
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (data.status) {
-          fetchChat();
-        }
-      });
+    );
   };
 
   const addAdmin = (un) => {
@@ -110,18 +153,7 @@ export default function Chat() {
         username: un,
         message: encrypt("gaveadminrightsto " + un, chat.secret),
       })
-    )
-      .then((res) => {
-        if (res.status != "200") {
-          return { status: false };
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (data.status) {
-          fetchChat();
-        }
-      });
+    );
   };
 
   const removeAdmin = (un) => {
@@ -132,18 +164,7 @@ export default function Chat() {
         username: un,
         message: encrypt("tookawayadminrightsfrom " + un, chat.secret),
       })
-    )
-      .then((res) => {
-        if (res.status != "200") {
-          return { status: false };
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (data.status) {
-          fetchChat();
-        }
-      });
+    );
   };
 
   const removeGroup = (e) => {
@@ -170,11 +191,48 @@ export default function Chat() {
       });
   };
 
+  const changeGroupData = (e) => {
+    e.preventDefault();
+    let dict = {};
+    if (
+      groupName.length > 2 &&
+      groupName.length < 16 &&
+      groupName != chat.name
+    ) {
+      dict.name = groupName;
+    }
+    if (groupDesc != chat.desc) {
+      dict.desc = groupDesc;
+    }
+    if (dict != {}) {
+      dict.id = chat.id;
+      dict.message = encrypt("changedgroupdata  ", chat.secret);
+      fetch("/api/c/save_settings", createPostData(dict))
+        .then((res) => {
+          if (res.status != "200") {
+            return { status: false };
+          }
+          return res.json();
+        })
+        .then(async (data) => {
+          if (data.status) {
+            setAdminPanelOpen(false);
+          }
+        });
+    }
+  };
+
   const { setMenu } = useContext(MenuContext);
   const { setIsLoader } = useContext(LoaderContext);
 
   useEffect(() => {
-    scrollToEnd();
+    if (!isTopMessageVisible || isFirst) {
+      scrollToEnd();
+      setIsFirst(false);
+    } else {
+      scrollToTop();
+      setIsLoader(false);
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -184,14 +242,24 @@ export default function Chat() {
     }
   }, [user, chat]);
 
+  function getBodyScrollTop() {
+    const el = document.scrollingElement || document.documentElement;
+    return el.scrollTop;
+  }
+
+  function setBodyScrollTop(val) {
+    const el = document.scrollingElement || document.documentElement;
+    el.scrollTop = val;
+  }
+
+  useInterval(() => {
+    fetchData();
+  }, 500);
+
   useEffect(() => {
     setIsLoader(true);
     fetchChat();
-    const newMessages = setInterval(() => {
-      fetchData();
-    }, 500);
     return () => {
-      clearInterval(newMessages);
       setMenu(undefined);
     };
   }, []);
@@ -212,11 +280,16 @@ export default function Chat() {
         setChatData(data);
       });
   };
+
   const setChatData = (data) => {
     if (data) {
       if (data.status) {
         if ("chat" in data) {
           setChat(data.chat);
+          if (data.chat.isGroup) {
+            setGroupName(data.chat.name);
+            setGroupDesc(data.chat.desc);
+          }
           chatId = data.chat.id;
           if (!data.chat.isGroup) {
             setMenu(
@@ -242,10 +315,7 @@ export default function Chat() {
         }
         if ("messages" in data) {
           setMessages(data.messages);
-          last =
-            data.messages && data.messages.length
-              ? data.messages[data.messages.length - 1].id
-              : 0;
+          setLast(data.last);
         }
         setIsLoader(false);
       } else {
@@ -254,23 +324,34 @@ export default function Chat() {
     }
   };
 
-  const sendMessage = (text) => {
-    fetch(
-      "/api/m/send",
-      createPostData({
-        id: chat.id,
-        text: encrypt(text, chat.secret),
-      })
-    );
+  const sendMessage = (
+    text,
+    id = chat.id,
+    secret = chat.secret,
+    isForwarded = false
+  ) => {
+    let dict = {
+      id: id,
+      text: encrypt(text, secret),
+    };
+    if (isForwarded || id != chat.id) {
+      dict.isForwarded = true;
+    } else if (replyMsg) {
+      dict.replyTo = replyMsg.id;
+    }
+    fetch("/api/m/send", createPostData(dict));
+    setReplyMsg(undefined);
   };
 
   const fetchData = () => {
-    if (chatId && last) {
+    if (chat) {
       fetch(
         "/api/m/get_new",
         createPostData({
-          id: chatId,
+          id: chat.id,
           last: last,
+          loadOld: !isFirst ? isTopMessageVisible : false,
+          msgs: messages.length,
         })
       )
         .then((res) => {
@@ -288,22 +369,56 @@ export default function Chat() {
       return [];
     }
   };
+
   const setMessagesData = (data) => {
     if (data) {
       if (data.status) {
         if ("messages" in data) {
-          if (
-            data.messages.filter((msg) => {
-              msg.isSystem;
-            })
-          ) {
-            fetchChat();
+          if (data.messages) {
+            if (
+              data.messages.filter((msg) => {
+                msg.isSystem;
+              })
+            ) {
+              fetchChat();
+            }
+            setMessages((messages) => {
+              return [...messages, ...data.messages];
+            });
           }
-          setMessages((messages) => [...messages, ...data.messages]);
-          last =
-            data.messages && data.messages.length
-              ? data.messages[data.messages.length - 1].id
-              : last;
+          if (data.old) {
+            setIsLoader(true);
+            let val = document.body.scrollHeight - getBodyScrollTop();
+            setScroll(val);
+            setMessages((messages) => {
+              return [...data.old, ...messages];
+            });
+          }
+          if (data.updates) {
+            setMessages((messages) => {
+              var indexes = [];
+              var found;
+              data.updates.forEach((message) => {
+                found = messages.some(function (msg, i) {
+                  if (msg.id == message.id) indexes.push([message, i]);
+                  return msg.id == message.id;
+                });
+              });
+              if (found) {
+                let msgs = messages;
+                indexes.forEach(([message, index]) => {
+                  if (message.isDeleted) {
+                    msgs.splice(index, 1);
+                  } else {
+                    msgs[index] = message;
+                  }
+                });
+                return msgs;
+              }
+              return messages;
+            });
+          }
+          setLast(data.last);
         }
         setIsLoader(false);
       } else if ("reason" in data) {
@@ -318,6 +433,10 @@ export default function Chat() {
     scrollTo.current.scrollIntoView();
   };
 
+  const scrollToTop = () => {
+    setBodyScrollTop(document.body.scrollHeight - scroll);
+  };
+
   const openMsgContextMenu = (id) => {
     setCurrentMsg(messages[id]);
     setMsgMenuOpen(true);
@@ -326,6 +445,28 @@ export default function Chat() {
   return (
     <>
       <IsAuth />
+      <PopUp show={isDeleteConfirmOpen} setIsShow={setDeleteConfirmOpen}>
+        <h2 className="center">{t("areyousure")}</h2>
+        <div style={{ maxWidth: "350px" }} className="flex">
+          <button
+            onClick={() => setDeleteConfirmOpen(false)}
+            className="chat-prev"
+            style={{ marginRight: "5px" }}
+          >
+            {t("no")}
+          </button>
+          <button
+            onClick={deleteMessage}
+            className="chat-prev"
+            style={{ marginLeft: "5px" }}
+          >
+            {t("yes")}
+          </button>
+        </div>
+      </PopUp>
+      <PopUp show={isForwardMenuOpen} setIsShow={setForwardMenuOpen}>
+        <ChatList chats={chats} noLinks={true} onClick={forward} />
+      </PopUp>
       <TPopUp show={isMsgMenuOpen} setIsShow={setMsgMenuOpen}>
         <div>
           <Message message={currentMsg} secret={chat ? chat.secret : ""} />
@@ -341,6 +482,56 @@ export default function Chat() {
             >
               {t("copy")}
             </button>
+            {currentMsg && !currentMsg.isSystem ? (
+              <>
+                <button
+                  onClick={() => {
+                    setReplyMsg(currentMsg);
+                    setMsgMenuOpen(false);
+                  }}
+                >
+                  {t("reply")}
+                </button>
+                <button
+                  onClick={() => {
+                    fetchChats();
+                    setForwardMenuOpen(true);
+                    setMsgMenuOpen(false);
+                  }}
+                >
+                  {t("forward")}
+                </button>
+                {currentMsg.author.username == user.username ? (
+                  <>
+                    {toLocalTime(currentMsg.sendTime) >=
+                    Date.now() - 1800000 ? (
+                      <button
+                        onClick={() => {
+                          setEdit(true);
+                          setMsgMenuOpen(false);
+                        }}
+                      >
+                        {t("edit")}
+                      </button>
+                    ) : (
+                      ""
+                    )}
+                    <button
+                      onClick={() => {
+                        setDeleteConfirmOpen(true);
+                        setMsgMenuOpen(false);
+                      }}
+                    >
+                      {t("delete")}
+                    </button>
+                  </>
+                ) : (
+                  ""
+                )}
+              </>
+            ) : (
+              ""
+            )}
           </div>
         </div>
       </TPopUp>
@@ -378,6 +569,26 @@ export default function Chat() {
           {isAdmin ? (
             <>
               <PopUp show={isAdminPanelOpen} setIsShow={setAdminPanelOpen}>
+                <form onSubmit={changeGroupData}>
+                  <h2 className="center">{t("settings")}</h2>
+                  <h3>{t("groupname")}</h3>
+                  <input
+                    placeholder={t("usernamelimit")}
+                    value={groupName}
+                    onChange={(e) => setGroupName(e.target.value)}
+                    type="text"
+                  />
+
+                  <h3>{t("description")}</h3>
+                  <input
+                    onChange={(e) => setGroupDesc(e.target.value)}
+                    value={groupDesc}
+                    type="text"
+                  />
+                  <div className="flex-center">
+                    <input type="submit" value={t("save")} />
+                  </div>
+                </form>
                 <button
                   onClick={() => {
                     setDeleteGroupOpen(true);
@@ -429,7 +640,10 @@ export default function Chat() {
       ) : (
         ""
       )}
-      <div style={{ scrollPaddingBottom: "80px" }}>
+      <div
+        id="cnt"
+        style={{ scrollPaddingBottom: replyMsg || isEdit ? "120px" : "80px" }}
+      >
         <div className="flex-center chat-title">
           <h2 style={{ fontSize: "20px" }}>
             {chat
@@ -441,22 +655,43 @@ export default function Chat() {
             {chat && chat.isAdmin ? <AdminBadge /> : ""}
           </h2>
         </div>
-        <div className="messages">
+        <div
+          style={{ marginBottom: replyMsg || isEdit ? "120px" : "80px" }}
+          className="messages"
+        >
+          <div ref={topMessage}></div>
           {messages ? (
-            messages.map((message, index) => (
-              <Message
-                key={message.id}
-                openContextMenu={() => openMsgContextMenu(index)}
-                message={message}
-                secret={chat.secret}
-              />
-            ))
+            messages.map((message, index) =>
+              !message.isDeleted ? (
+                <Message
+                  key={message.id}
+                  openContextMenu={() => openMsgContextMenu(index)}
+                  message={message}
+                  secret={chat.secret}
+                />
+              ) : (
+                ""
+              )
+            )
           ) : (
             <p className="msg msg-info">{t("startchatting")}</p>
           )}
           <div ref={scrollTo}></div>
         </div>
-        {chat ? <MessageInput sendMsg={sendMessage} /> : ""}
+        {chat ? (
+          <MessageInput
+            isEdit={isEdit}
+            setEdit={setEdit}
+            editMsg={editMessage}
+            currentMsg={currentMsg}
+            replyTo={replyMsg}
+            setReplyTo={setReplyMsg}
+            sendMsg={sendMessage}
+            secret={chat.secret}
+          />
+        ) : (
+          ""
+        )}
       </div>
     </>
   );

@@ -31,26 +31,35 @@
 
   "start": "start",
 
+  "all": "all",
+  "search": "search",
+
   "you": "you",
 
   "openchat": "open chat",
 
-  "chat": "chat",
-  "with": "with",
+  "chatwith": "chat with",
 
   "members": "members",
   "addmember": "add member",
 
-  "createdgroup": "created group",
-  "added": "added",
-  "removed": "removed",
-  "gaveadminrightsto": "gave admin rights to",
-  "tookawayadminrightsfrom": "removed admin rights from",
+  "createdgroup": "created group {0}",
+  "added": "added {0}",
+  "removed": "removed {0}",
+  "gaveadminrightsto": "gave admin rights to {0}",
+  "tookawayadminrightsfrom": "removed admin rights from {0}",
   "leftgroup": "left group",
+  "changedgroupdata": "changed group data",
 
   "message": "message",
 
   "copy": "copy",
+  "reply": "reply",
+  "forward": "forward",
+  "edit": "edit",
+  "delete": "delete",
+
+  "replyto": "reply to",
 
   "nomessages": "no messages",
   "startchatting": "start chatting",
@@ -63,6 +72,7 @@
   "verified": "verified",
 
   "settings": "settings",
+  "save": "save",
 
   "deletegroup": "delete group",
 

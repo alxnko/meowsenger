@@ -43,6 +43,9 @@ blocks
   justify-content: center;
   flex-direction: column;
 }
+.jc-sb {
+  justify-content: space-between;
+}
 .full-bg {
   min-height: calc(100 * var(--vh) - 3px);
   top: 0;

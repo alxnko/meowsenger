@@ -1,13 +1,16 @@
 button,
-input[type="button"],
-input[type="submit"] {
+input[type="submit"],
+input[type="button"] {
   width: auto;
   font-family: "Trebuchet MS", sans-serif;
   border: none;
-  background-color: var(--simplecolor);
   color: var(--pcolor);
   padding: 0.5rem 1.5rem;
   font-size: 20px;
+}
+button,
+input[type="button"] {
+  background-color: var(--simplecolor);
 }
 button:hover,
 input[type="button"]:hover,

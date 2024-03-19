@@ -43,7 +43,7 @@ export default function Login() {
   return (
     <form onSubmit={logMe}>
       <IsNotAuth />
-      <h1>{t("login")}</h1>
+      <h1 className="center">{t("login")}</h1>
       <label htmlFor="username">{t("username")}</label>
       <input
         id="username"

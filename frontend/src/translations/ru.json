@@ -31,38 +31,48 @@
 
   "start": "начать",
 
+  "all": "все",
+  "search": "поиск",
+
   "you": "вы",
 
   "openchat": "открыть чат",
 
-  "chat": "чат",
-  "with": "с",
+  "chatwith": "чат с",
 
   "members": "участникoв",
   "addmember": "добавить участника",
 
-  "createdgroup": "создал группу",
-  "added": "добавил",
-  "removed": "удалил",
-  "leftgroup": "покинул группу",
+  "createdgroup": "создал группу {0}",
+  "added": "добавил {0}",
+  "removed": "удалил {0}",
+  "leftgroup": "{0} покинул группу",
+  "changedgroupdata": "изменил данные группы",
 
   "message": "сообщение",
 
   "copy": "копировать",
+  "reply": "ответить",
+  "forward": "переслать",
+  "edit": "редактировать",
+  "delete": "удалить",
+
+  "replyto": "ответить на",
 
   "nomessages": "нет сообщений",
   "startchatting": "начните общение",
 
   "lang": "язык",
   "loading": "загрузка",
-  "gaveadminrightsto": "дал права админа",
-  "tookawayadminrightsfrom": "забрал права админа у",
+  "gaveadminrightsto": "дал {0} права админа",
+  "tookawayadminrightsfrom": "забрал права админа у {0}",
   "testdesc": "meowsenger классный",
 
   "admin": "админ",
   "verified": "подтвержден",
 
   "settings": "настройки",
+  "save": "сохранить",
 
   "deletegroup": "удалить группу",
 

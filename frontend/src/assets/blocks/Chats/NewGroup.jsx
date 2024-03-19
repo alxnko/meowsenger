@@ -53,7 +53,7 @@ export default function NewGroup({ show, setIsShow }) {
   return (
     <PopUp show={show} setIsShow={setIsShow}>
       <form className="fl-cn-cl" onSubmit={newChat}>
-        <h2>{t("newgroup")}</h2>
+        <h2 className="center">{t("newgroup")}</h2>
         <input
           value={groupName}
           onChange={handleGroupName}

@@ -51,6 +51,7 @@ export default function GroupBlock({ group, openUserList, openAdminPanel }) {
           </button>
         </Link>
       </div>
+      <p className="center">{group.desc}</p>
       <div className="flex-center">
         {user && group.admins.includes(user.username) ? (
           <Link>

@@ -1,6 +1,7 @@
 from flask import redirect, request, Blueprint
 from flask_login import login_user, current_user, logout_user, login_required
 from meowsenger.models import Chat, User, Message
+# from meowsenger.main.routes import mark_as_read
 from meowsenger import db, bcrypt
 
 users = Blueprint("users", __name__)
@@ -90,7 +91,7 @@ def saveSettings():
 
 @users.route("/api/u/admin_edit", methods=["POST"])
 def adminEdit():
-    if current_user.is_admin or current_user.username == "alxnko":
+    if current_user.is_admin:
         data = request.get_json()
         user = User.query.get(data['id'])
         if data['action'] == "verify":

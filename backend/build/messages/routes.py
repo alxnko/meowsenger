@@ -40,17 +40,17 @@ def messages_to_arr(messages):
         return [message_to_dict(msg) for msg in messages if not msg.is_deleted]
 
 
-def messages_to_arr_from(chat, frm=1, to=50):
-    messages = [msg for msg in chat.messages if not msg.is_deleted]
-    if frm == 1:
-        return [message_to_dict(msg) for msg in messages[-to:]]
-    else:
-        return [message_to_dict(msg) for msg in messages[-to:-frm]]
-
-
 def updates_to_arr(updates):
     if updates:
         return [message_to_dict(Message.query.get(upd.message_id)) for upd in updates]
+        # out = []
+        # for upd in updates:
+        #     message = Message.query.get(upd.message_id)
+        #     if not message.is_deleted:
+        #         out.append(message_to_dict(message))
+        #     else:
+        #         out.append({"id": message.id, "isDeleted": True})
+        # return out
 
 
 @messages.route("/api/m/get_new", methods=["POST"])
@@ -65,13 +65,11 @@ def get_new():
             Message.chat_id == chat_id, Message.send_time > datetime.fromtimestamp(last)).all()
         updates = Update.query.filter(
             Update.chat_id == chat_id, Update.time > datetime.fromtimestamp(last)).all()
-        old = messages_to_arr_from(
-            chat, data["msgs"]+1, data["msgs"]+51) if data["loadOld"] and Message.query.filter(Message.chat_id == chat_id, Message.is_deleted == False).count() > data["loadOld"] else None
-        if messages or updates or old:
+        if messages or updates:
             mark_as_read(messages)
             last = time.mktime(chat.last_time.timetuple())
             return {"status": True, "messages": messages_to_arr(messages),
-                    "updates": updates_to_arr(updates), "old": old, "last": last}
+                    "updates": updates_to_arr(updates), "last": last}
         return {"status": False}
     return {"status": False, "reason": "not in chat"}
 

@@ -1,7 +1,7 @@
 from flask import request, Blueprint
 from flask_login import current_user, login_required
 from meowsenger.models import Chat, User, Message
-from meowsenger.messages.routes import messages_to_arr_from
+from meowsenger.messages.routes import message_to_dict
 from meowsenger.users.routes import user_to_dict
 from meowsenger import db, bcrypt
 from datetime import datetime
@@ -18,6 +18,14 @@ def mark_as_read(chat):
             break
     db.session.add(chat)
     db.session.commit()
+
+
+def messages_to_arr(chat, frm=1, to=50):
+    messages = [msg for msg in chat.messages if not msg.is_deleted]
+    if frm == 1:
+        return [message_to_dict(msg) for msg in messages[-to:]]
+    else:
+        return [message_to_dict(msg) for msg in messages[-to:-frm]]
 
 
 def mark_as_not_read(chat, msg):
@@ -114,7 +122,7 @@ def getChat():
             for chat in current_user.chats:
                 if not chat.is_group and len(chat.users) == 1:
                     last = time.mktime(chat.last_time.timetuple())
-                    return {"status": True, "chat": chat_to_dict(chat), "messages": messages_to_arr_from(chat), "last": last}
+                    return {"status": True, "chat": chat_to_dict(chat), "messages": messages_to_arr(chat), "last": last}
             chat = Chat()
             chat.users.append(user)
             db.session.add(chat)
@@ -128,7 +136,7 @@ def getChat():
                 if not chat.is_group and user in chat.users:
                     mark_as_read(chat)
                     last = time.mktime(chat.last_time.timetuple())
-                    return {"status": True, "chat": chat_to_dict(chat), "messages": messages_to_arr_from(chat), "last": last}
+                    return {"status": True, "chat": chat_to_dict(chat), "messages": messages_to_arr(chat), "last": last}
             chat = Chat()
             chat.users.append(user)
             chat.users.append(current_user)
@@ -192,7 +200,7 @@ def getGroup():
         if chat.is_group and current_user in chat.users:
             mark_as_read(chat)
             last = time.mktime(chat.last_time.timetuple())
-            return {"status": True, "chat": chat_to_dict(chat), "messages": messages_to_arr_from(chat), "last": last}
+            return {"status": True, "chat": chat_to_dict(chat), "messages": messages_to_arr(chat), "last": last}
         else:
             return {"status": False}
     return {"status": False}, 404

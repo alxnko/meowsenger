@@ -1,5 +1,5 @@
 .react-tooltip {
-  z-index: 9999;
+  z-index: 10000;
   border: 1px solid var(--greencolor);
   background: var(--reversepcolor) !important;
   color: var(--hovercolor) !important;

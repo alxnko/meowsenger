@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import IsAuth from "../../assets/blocks/Auth/IsAuth";
 import ChatList from "../../assets/blocks/Chats/ChatList";
 import NewChat from "../../assets/blocks/Chats/NewChat";
@@ -87,7 +87,7 @@ export default function Chats() {
             setIsCreateMenuOpen(false);
             setIsNewChatOpen(true);
           }}
-          className="chat-prev"
+          className="chat-prev center"
         >
           {t("newchat")}
         </button>
@@ -96,7 +96,7 @@ export default function Chats() {
             setIsCreateMenuOpen(false);
             setIsNewGroupOpen(true);
           }}
-          className="chat-prev"
+          className="chat-prev center"
         >
           {t("newgroup")}
         </button>
@@ -105,48 +105,20 @@ export default function Chats() {
             setIsCreateMenuOpen(false);
             // setIsNewChannelOpen(true);
           }}
-          className="chat-prev"
+          className="chat-prev center"
         >
           {t("newchannel")}
         </button>
       </PopUp>
-      <p>{t("chatlist")}</p>
+      <p className="center">{t("chatlist")}</p>
       <div>
         <div className="chats">
           <button
             onClick={() => setIsCreateMenuOpen(true)}
-            className="chat-prev"
+            className="chat-prev center"
           >
             {t("createnew")}
           </button>
-          <div className="flex">
-            <Link className={isMain ? "active" : ""} to="/chats">
-              <button style={{ marginRight: "5px" }} className="chat-prev w4">
-                {t("all")}
-              </button>
-            </Link>
-            <NavLink to="/chats/u">
-              <button
-                style={{ marginLeft: "5px", marginRight: "5px" }}
-                className="chat-prev w4"
-              >
-                {t("u.")}
-              </button>
-            </NavLink>
-            <NavLink to="/chats/g">
-              <button
-                style={{ marginLeft: "5px", marginRight: "5px" }}
-                className="chat-prev w4"
-              >
-                {t("g.")}
-              </button>
-            </NavLink>
-            <NavLink to="/chats/c">
-              <button style={{ marginLeft: "5px" }} className="chat-prev w4">
-                {t("c.")}
-              </button>
-            </NavLink>
-          </div>
           <ChatList chats={chats} filter={filter} />
         </div>
       </div>

@@ -2,13 +2,12 @@
   z-index: 900;
   position: fixed;
   top: 0;
-  width: 350px;
-  /* color: white; */
+  max-width: 350px;
 }
 .chat-title h2 {
-  min-width: 206px;
+  width: 350px;
   text-align: center;
-  padding: 5px 5px 57px 5px;
+  padding: 5px 5px 61px 5px;
   border-radius: 0 0 30px 30px;
   background-color: var(--simplecolor);
 }
@@ -28,6 +27,23 @@
   max-width: 250px;
   margin-top: 5px;
   margin-right: 80px;
+}
+.msg .reply {
+  margin: 5px 0;
+  font-size: 14px;
+  border-radius: 0 5px 5px 0;
+  border-left: 2px solid var(--greencolor);
+  background-color: var(--bgcolor);
+  color: var(--pcolor);
+  padding: 5px;
+}
+.msg .reply .time {
+  color: var(--pcolor);
+}
+.msg-my .reply {
+  border-left: none;
+  border-right: 2px solid var(--greencolor);
+  border-radius: 5px 0 0 5px;
 }
 .msg-text {
   color: var(--hcolor);
@@ -57,7 +73,7 @@
   color: var(--bgcolor);
 }
 .msg-my .time {
-  color: var(--simplecolorop);
+  color: var(--simplecolor);
 }
 textarea {
   margin: 0;
@@ -66,13 +82,12 @@ textarea {
 .msg-form {
   position: fixed;
   bottom: -1px;
-  display: flex;
   align-items: center;
 }
 .msg-form textarea {
   margin: 0;
   border-bottom: none;
-  padding: 11px;
+  padding: 10px;
 }
 .msg-form button {
   display: flex;
@@ -82,6 +97,21 @@ textarea {
   margin: 0;
   min-width: 40px;
   min-height: 78px;
+}
+.msg-form .reply {
+  background-color: var(--simplecolor);
+  border-bottom: 1px solid var(--pcolor);
+  padding: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 430px;
+}
+.msg-form .reply button {
+  font-size: 16px;
+  min-width: unset;
+  min-height: unset;
+  padding: 0 5px;
 }
 
 .user-link {

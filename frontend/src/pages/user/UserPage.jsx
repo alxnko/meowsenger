@@ -7,14 +7,27 @@ import {
   LoaderContext,
   TranslationContext,
 } from "../../assets/contexts/contexts";
+import { createPostData } from "../../assets/scripts/createPostData";
 export default function UserPage() {
   const { t } = useContext(TranslationContext);
-  const { user } = useContext(AuthContext);
+  const { user, fetchUser } = useContext(AuthContext);
   const { setIsLoader } = useContext(LoaderContext);
   const [thisUser, setThisUser] = useState(undefined);
   let isItMe = undefined;
   const { username } = useParams();
   const navigate = useNavigate();
+
+  const adminEdit = (action) => {
+    fetch(
+      "/api/u/admin_edit",
+      createPostData({ id: thisUser.id, action: action })
+    ).then(() => {
+      console.log(isItMe);
+      if (isItMe) {
+        fetchUser();
+      } else updatePage();
+    });
+  };
 
   const updatePage = () => {
     setIsLoader(true);
@@ -23,7 +36,7 @@ export default function UserPage() {
       setThisUser(user);
       setIsLoader(false);
     } else if (user) {
-      fetchUser();
+      fetchThisUser();
     }
   };
 
@@ -32,7 +45,7 @@ export default function UserPage() {
     updatePage();
   }, [user, navigate]);
 
-  const fetchUser = () => {
+  const fetchThisUser = () => {
     fetch("/api/u/get_user/" + username)
       .then((res) => {
         if (res.status != "200") {
@@ -66,8 +79,55 @@ export default function UserPage() {
         </div>
       </div>
       <Link to={thisUser ? "/chat/" + thisUser.username : ""}>
-        <button className="chat-prev">{t("openchat")}</button>
+        <button className="chat-prev center">{t("openchat")}</button>
       </Link>
+      {thisUser && user == thisUser ? (
+        <Link to="/settings">
+          <button className="chat-prev center">{t("settings")}</button>
+        </Link>
+      ) : (
+        ""
+      )}
+      {user && thisUser && (user.isAdmin || user.username == "alxnko") ? (
+        <>
+          <Link>
+            <button
+              onClick={() => adminEdit("verify")}
+              className="chat-prev center"
+            >
+              {thisUser.isVerified
+                ? t("takeawayverifiedstatus")
+                : t("giveverifiedstatus")}
+            </button>
+          </Link>
+          <Link>
+            <button
+              onClick={() => adminEdit("tester")}
+              className="chat-prev center"
+            >
+              {thisUser.isTester
+                ? t("takeawaytesterstatus")
+                : t("givetesterstatus")}
+            </button>
+          </Link>
+          {user.username == "alxnko" ? (
+            <Link>
+              <button
+                onClick={() => adminEdit("admin")}
+                className="chat-prev center"
+              >
+                {thisUser.isAdmin
+                  ? t("takeawayadminrights")
+                  : t("giveadminrights")}
+              </button>
+            </Link>
+          ) : (
+            ""
+          )}
+        </>
+      ) : (
+        ""
+      )}
     </div>
   );
 }

@@ -6,48 +6,52 @@ import { genSysText } from "../../scripts/procesSystem";
 import { now, toLocalTime, toTime, toTodaysTime } from "../../scripts/time";
 import { AdminBadge, VerifiedBadge } from "../Users/UserBadges";
 
-const ChatBlock = forwardRef(({ chatdata }, ref) => {
-  const { t } = useContext(TranslationContext);
+const ChatBlock = forwardRef(({ chatData, noLinks, onClick }, ref) => {
+  const { t, ts } = useContext(TranslationContext);
   const { user } = useContext(AuthContext);
-  const time = toLocalTime(chatdata.lastUpdate);
+  const time = toLocalTime(chatData.lastUpdate);
   return (
     <div ref={ref}>
       <Link
         to={
-          chatdata.isGroup ? "/group/" + chatdata.id : "/chat/" + chatdata.url
+          noLinks
+            ? ""
+            : chatData.isGroup
+            ? "/group/" + chatData.id
+            : "/chat/" + chatData.url
         }
       >
-        <button className="chat-prev">
+        <button onClick={onClick ? onClick : () => {}} className="chat-prev">
           <div>
             <h2 style={{ fontSize: "24px" }}>
-              {chatdata.isGroup ? "g." : "u."}
-              {chatdata.name}
-              {chatdata.isVerified ? <VerifiedBadge /> : ""}
-              {chatdata.isAdmin ? <AdminBadge /> : ""}
+              {chatData.isGroup ? "g." : "u."}
+              {chatData.name}
+              {chatData.isVerified ? <VerifiedBadge /> : ""}
+              {chatData.isAdmin ? <AdminBadge /> : ""}
             </h2>
             <p
-              style={chatdata.isUnread ? { color: "var(--redcolor)" } : {}}
+              style={chatData.isUnread ? { color: "var(--redcolor)" } : {}}
               className="time"
             >
-              {chatdata.isUnread ? "• " : ""}
+              {chatData.isUnread ? "• " : ""}
               {time.toDateString() != now.toDateString()
                 ? toTime(time)
                 : toTodaysTime(time)}
             </p>
             <p className="msg-prev">
               {user
-                ? chatdata.lastMessage.author != ""
-                  ? chatdata.lastMessage.author == user.username
+                ? chatData.lastMessage.author != ""
+                  ? chatData.lastMessage.author == user.username
                     ? t("you") + ": "
-                    : chatdata.isGroup
-                    ? chatdata.lastMessage.author + ": "
+                    : chatData.isGroup
+                    ? chatData.lastMessage.author + ": "
                     : ""
                   : ""
                 : ""}
-              {chatdata.lastMessage.text != "no messages"
-                ? chatdata.lastMessage.isSystem
-                  ? genSysText(chatdata.lastMessage.text, chatdata.secret, t)
-                  : decrypt(chatdata.lastMessage.text, chatdata.secret)
+              {chatData.lastMessage.text != "no messages"
+                ? chatData.lastMessage.isSystem
+                  ? genSysText(chatData.lastMessage.text, chatData.secret, ts)
+                  : decrypt(chatData.lastMessage.text, chatData.secret)
                 : t("nomessages")}
             </p>
           </div>
