@@ -15,7 +15,7 @@ export default function Login() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const handleUsername = (e) => {
-    setUsername(e.target.value.replace(/\s/g, ""));
+    setUsername(e.target.value.replace(/\s/g, "").toLowerCase());
   };
   const logMe = async (e) => {
     e.preventDefault();

@@ -16,7 +16,7 @@ export default function Signup() {
   const [password2, setPassword2] = useState("");
   const [error, setError] = useState("");
   const handleUsername = (e) => {
-    setUsername(e.target.value.replace(/\s/g, ""));
+    setUsername(e.target.value.replace(/\s/g, "").toLowerCase());
   };
   const regMe = (e) => {
     e.preventDefault();
