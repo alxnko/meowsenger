@@ -6,7 +6,6 @@ import {
   BiSolidUser,
 } from "react-icons/bi";
 import { Link } from "react-router-dom";
-import { Tooltip } from "react-tooltip";
 import { AuthContext, TranslationContext } from "../../contexts/contexts";
 
 export default function Menu({ isOnTop, switchMenu }) {
@@ -18,9 +17,6 @@ export default function Menu({ isOnTop, switchMenu }) {
       style={isOnTop ? { top: "30px" } : { bottom: "30px" }}
       className="menu"
     >
-      <Tooltip id="admin-tooltip" />
-      <Tooltip id="verified-tooltip" />
-      <Tooltip id="tester-tooltip" />
       {user != "unAuth" ? (
         <Link to="/chats">
           <button className="flex">

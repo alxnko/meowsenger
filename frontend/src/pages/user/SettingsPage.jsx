@@ -59,6 +59,7 @@ export default function SettingsPage() {
       <form onSubmit={save}>
         <label htmlFor="desc">{t("description")}</label>
         <input
+          className="search"
           id="desc"
           value={desc}
           onChange={(e) => {

@@ -76,5 +76,14 @@
 
   "deletegroup": "delete group",
 
-  "description": "description"
+  "description": "description",
+
+  "mainPrivate": "private",
+  "mainPrivateDesc": "each message is encrypted, each chat has its own secret key",
+
+  "mainSecure": "secure",
+  "mainSecureDesc": "all messages are deleted 14 days after sending",
+
+  "mainAnonymity": "anonymity",
+  "mainAnonymityDesc": "no account confirmation required"
 }

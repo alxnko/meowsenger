@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import IsAuth from "../../assets/blocks/Auth/IsAuth";
+import Footer from "../../assets/blocks/Footer";
 import UserBadges from "../../assets/blocks/Users/UserBadges";
 import {
   AuthContext,
@@ -128,6 +129,7 @@ export default function UserPage() {
       ) : (
         ""
       )}
+      <Footer />
     </div>
   );
 }

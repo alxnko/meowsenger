@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Tooltip } from "react-tooltip";
 import Layout from "./assets/blocks/Layout";
 import {
   AuthContext,
@@ -51,6 +52,9 @@ export default function App() {
   };
   return (
     <TranslationContext.Provider value={{ t, ts, i18n }}>
+      <Tooltip id="admin-tooltip" />
+      <Tooltip id="verified-tooltip" />
+      <Tooltip id="tester-tooltip" />
       <AuthContext.Provider value={{ user, setUser, fetchUser }}>
         <LoaderContext.Provider value={{ isLoader, setIsLoader }}>
           <MenuContext.Provider value={{ menu, setMenu }}>

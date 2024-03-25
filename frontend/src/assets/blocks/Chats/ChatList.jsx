@@ -12,6 +12,7 @@ export default function ChatList({ chats, noLinks, onClick }) {
       <ChatFilter filter={filter} setFilter={setFilter} />
       {chats ? (
         <input
+          className="search"
           style={{ marginBottom: "0", marginTop: "10px" }}
           placeholder={t("search")}
           value={search}

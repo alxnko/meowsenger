@@ -20,6 +20,7 @@ import {
   MenuContext,
   TranslationContext,
 } from "../../assets/contexts/contexts";
+import { findMessageId } from "../../assets/scripts/binarySearch";
 import { createPostData } from "../../assets/scripts/createPostData";
 import { decrypt, encrypt } from "../../assets/scripts/encryption";
 import { toLocalTime } from "../../assets/scripts/time";
@@ -399,10 +400,11 @@ export default function Chat() {
               var indexes = [];
               var found;
               data.updates.forEach((message) => {
-                found = messages.some(function (msg, i) {
-                  if (msg.id == message.id) indexes.push([message, i]);
-                  return msg.id == message.id;
-                });
+                let localMessageId = findMessageId(messages, message.id);
+                if (localMessageId != -1) {
+                  indexes.push([message, localMessageId]);
+                  found = true;
+                }
               });
               if (found) {
                 let msgs = messages;
@@ -573,6 +575,7 @@ export default function Chat() {
                   <h2 className="center">{t("settings")}</h2>
                   <h3>{t("groupname")}</h3>
                   <input
+                    className="search"
                     placeholder={t("usernamelimit")}
                     value={groupName}
                     onChange={(e) => setGroupName(e.target.value)}
@@ -581,6 +584,7 @@ export default function Chat() {
 
                   <h3>{t("description")}</h3>
                   <input
+                    className="search"
                     onChange={(e) => setGroupDesc(e.target.value)}
                     value={groupDesc}
                     type="text"
@@ -610,11 +614,7 @@ export default function Chat() {
                   <div className="invalid-feedback">
                     <span>{error}</span>
                   </div>
-                  <input
-                    className="chat-prev center"
-                    type="submit"
-                    value="OK"
-                  />
+                  <input className="center" type="submit" value="OK" />
                 </form>
               </PopUp>
               <PopUp show={isDeleteGroupOpen} setIsShow={setDeleteGroupOpen}>
@@ -627,9 +627,7 @@ export default function Chat() {
                     onChange={(e) => setPassword(e.target.value)}
                     type="password"
                   />
-                  <button className="chat-prev center" type="submit">
-                    OK
-                  </button>
+                  <input value="OK" className="center" type="submit" />
                 </form>
               </PopUp>
             </>

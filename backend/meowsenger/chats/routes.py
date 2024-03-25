@@ -29,7 +29,7 @@ def mark_as_not_read(chat, msg):
 
 def get_last_message(chat):
     if len(chat.messages):
-        for i in range(1, len(chat.messages)):
+        for i in range(1, len(chat.messages)+1):
             if not chat.messages[-i].is_deleted:
                 return chat.messages[-i]
 
