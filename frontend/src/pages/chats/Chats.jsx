@@ -4,8 +4,10 @@ import IsAuth from "../../assets/blocks/Auth/IsAuth";
 import ChatList from "../../assets/blocks/Chats/ChatList";
 import NewChat from "../../assets/blocks/Chats/NewChat";
 import NewGroup from "../../assets/blocks/Chats/NewGroup";
+import { useInterval } from "../../assets/blocks/hooks/useInterval";
 import PopUp from "../../assets/blocks/PopUps/PopUp";
 import {
+  AuthContext,
   LoaderContext,
   TranslationContext,
 } from "../../assets/contexts/contexts";
@@ -23,6 +25,7 @@ export default function Chats() {
   const [isMain, setIsMain] = useState(true);
 
   const [chats, setChats] = useState(undefined);
+  const { user } = useContext(AuthContext);
   const { t } = useContext(TranslationContext);
   const { setIsLoader } = useContext(LoaderContext);
 
@@ -38,30 +41,32 @@ export default function Chats() {
     setIsMain(isMain);
   }, [navigate]);
 
+  useInterval(async () => {
+    fetchData();
+  }, 500);
+
   useEffect(() => {
     setIsLoader(true);
-    const updateChats = setInterval(async () => {
-      fetchData();
-    }, 500);
-    return () => clearInterval(updateChats);
   }, []);
 
   const fetchData = async () => {
-    await fetch(
-      "/api/c/get_chats",
-      createPostData({ lastUpdate: lastUpdate, chats: chatsLen })
-    )
-      .then((res) => {
-        if (res.status != "200") {
-          setIsLoader(true);
-          return [];
-        }
-        setIsLoader(false);
-        return res.json();
-      })
-      .then((data) => {
-        setData(data);
-      });
+    if (user) {
+      await fetch(
+        "/api/c/get_chats",
+        createPostData({ lastUpdate: lastUpdate, chats: chatsLen })
+      )
+        .then((res) => {
+          if (res.status != "200") {
+            setIsLoader(true);
+            return [];
+          }
+          setIsLoader(false);
+          return res.json();
+        })
+        .then((data) => {
+          setData(data);
+        });
+    }
   };
   const setData = (data) => {
     if (data) {

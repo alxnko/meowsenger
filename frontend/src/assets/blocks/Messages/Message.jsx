@@ -25,11 +25,34 @@ export default function Message({
     openContextMenu();
   };
 
-  const onClick = () => {};
+  const onClick = () => {
+    openContextMenu();
+  };
   const defaultOptions = {
     shouldPreventDefault: true,
     delay: 200,
   };
+
+  var timer;
+
+  function onlongtouch() {
+    timer = null;
+    openContextMenu();
+  }
+  function touchstart(e) {
+    if (!timer) {
+      timer = setTimeout(function () {
+        onlongtouch();
+      }, 200);
+    }
+  }
+
+  function touchend() {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+  }
 
   const longPressEvent = useLongPress(onLongPress, onClick, defaultOptions);
 
@@ -46,6 +69,9 @@ export default function Message({
           openContextMenu();
         }
       }}
+      onTouchStart={touchstart}
+      onTouchEnd={touchend}
+      onClick={() => {}}
       className={
         "msg new-msg" +
         (message && message.isSystem ? " msg-info" : isMine ? " msg-my" : "")

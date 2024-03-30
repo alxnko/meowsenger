@@ -27,11 +27,8 @@ def mark_as_not_read(chat, msg):
     db.session.commit()
 
 
-def get_last_message(chat):
-    if len(chat.messages):
-        for i in range(1, len(chat.messages)+1):
-            if not chat.messages[-i].is_deleted:
-                return chat.messages[-i]
+def get_last_message(chat_id):
+    return Message.query.filter_by(chat_id=chat_id).order_by(Message.id.desc()).first()
 
 
 def chat_to_block_dict(chat: Chat):
@@ -39,13 +36,14 @@ def chat_to_block_dict(chat: Chat):
         i for i in chat.users if i.username != current_user.username][0].username
     user = None if chat.is_group else User.query.filter_by(
         username=name).first()
-    last_message = get_last_message(chat)
+    last_message = get_last_message(chat.id)
     return {
         "id": chat.id,
         "name": name,
         "secret": chat.secret,
         "isVerified": chat.is_verified if chat.is_group else user.is_verified,
         "isAdmin": True if user and user.is_admin else False,
+        "isTester": True if user and user.is_tester else False,
         "lastMessage":
             {"text": last_message.text,
              "author": last_message.author.username,
@@ -73,6 +71,7 @@ def chat_to_dict(chat: Chat):
         "secret": chat.secret,
         "isVerified": chat.is_verified if chat.is_group else user.is_verified,
         "isAdmin": True if user and user.is_admin else False,
+        "isTester": True if user and user.is_tester else False,
         "users": ([user_to_dict(i) for i in chat.users] if chat.is_group else [user_to_dict(i) for i in chat.users if i.username != current_user.username]) if len(chat.users) != 1 else [{"username": current_user.username}],
         "admins": [i.username for i in chat.admins] if chat.is_group else [],
         "isGroup": chat.is_group,
@@ -114,7 +113,7 @@ def getChat():
             for chat in current_user.chats:
                 if not chat.is_group and len(chat.users) == 1:
                     last = time.mktime(chat.last_time.timetuple())
-                    return {"status": True, "chat": chat_to_dict(chat), "messages": messages_to_arr_from(chat), "last": last}
+                    return {"status": True, "chat": chat_to_dict(chat), "messages": messages_to_arr_from(chat.id), "last": last}
             chat = Chat()
             chat.users.append(user)
             db.session.add(chat)
@@ -128,7 +127,7 @@ def getChat():
                 if not chat.is_group and user in chat.users:
                     mark_as_read(chat)
                     last = time.mktime(chat.last_time.timetuple())
-                    return {"status": True, "chat": chat_to_dict(chat), "messages": messages_to_arr_from(chat), "last": last}
+                    return {"status": True, "chat": chat_to_dict(chat), "messages": messages_to_arr_from(chat.id), "last": last}
             chat = Chat()
             chat.users.append(user)
             chat.users.append(current_user)
@@ -192,7 +191,7 @@ def getGroup():
         if chat.is_group and current_user in chat.users:
             mark_as_read(chat)
             last = time.mktime(chat.last_time.timetuple())
-            return {"status": True, "chat": chat_to_dict(chat), "messages": messages_to_arr_from(chat), "last": last}
+            return {"status": True, "chat": chat_to_dict(chat), "messages": messages_to_arr_from(chat.id), "last": last}
         else:
             return {"status": False}
     return {"status": False}, 404

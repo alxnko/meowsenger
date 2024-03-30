@@ -33,6 +33,8 @@
 
   "all": "все",
   "search": "поиск",
+  "why": "почему",
+  "or": "или",
 
   "you": "вы",
 
@@ -70,9 +72,20 @@
 
   "admin": "админ",
   "verified": "подтвержден",
+  "tester": "тестер",
+
+  "areyousure": "вы уверены?",
+  "yes": "да",
+  "no": "нет",
 
   "settings": "настройки",
   "save": "сохранить",
+
+  "usersettings": "настройки пользователя",
+  "appsettings": "настройки приложения",
+
+  "enablenotifications": "включить уведомления",
+  "notificationsenabled": "уведомления включены",
 
   "deletegroup": "удалить группу",
 

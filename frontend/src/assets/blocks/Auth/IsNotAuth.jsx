@@ -1,13 +1,18 @@
 import React, { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../contexts/contexts";
+import { AuthContext, LoaderContext } from "../../contexts/contexts";
 
 export default function IsNotAuth() {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
+  const { setIsLoader } = useContext(LoaderContext);
   useEffect(() => {
-    if (user && user != "unAuth") {
-      navigate("/chats");
+    if (user) {
+      if (user != "unAuth") {
+        navigate("/chats");
+      } else {
+        setIsLoader(false);
+      }
     }
   }, [user]);
   return <></>;

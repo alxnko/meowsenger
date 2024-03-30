@@ -1,6 +1,6 @@
-from flask import redirect, request, Blueprint
+from flask import request, Blueprint
 from flask_login import login_user, current_user, logout_user, login_required
-from meowsenger.models import Chat, User, Message
+from meowsenger.models import User
 from meowsenger import db, bcrypt
 
 users = Blueprint("users", __name__)

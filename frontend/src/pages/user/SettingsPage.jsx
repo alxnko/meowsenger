@@ -1,10 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useInterval } from "../../assets/blocks/hooks/useInterval";
 import {
   AuthContext,
   TranslationContext,
 } from "../../assets/contexts/contexts";
 import { createPostData } from "../../assets/scripts/createPostData";
+import { enableNotifications } from "../../assets/scripts/notifications";
 
 export default function SettingsPage() {
   const navigate = useNavigate();
@@ -14,6 +16,8 @@ export default function SettingsPage() {
   const [desc, newDesc] = useState("");
   const [error, setError] = useState("");
 
+  const [isNotify, setIsNotify] = useState(undefined);
+
   let oldDesc = "";
 
   useEffect(() => {
@@ -22,6 +26,14 @@ export default function SettingsPage() {
     }
     oldDesc = user ? user.desc : "";
   }, [user]);
+
+  useEffect(() => {
+    checkNotify();
+  }, []);
+
+  useInterval(() => {
+    checkNotify();
+  }, 2000);
 
   const save = async (e) => {
     e.preventDefault();
@@ -50,6 +62,21 @@ export default function SettingsPage() {
     }
   };
 
+  const checkNotify = async () => {
+    navigator.serviceWorker.getRegistration().then((reg) => {
+      if (reg) {
+        setIsNotify(Notification.permission == "granted");
+      } else {
+        setIsNotify(false);
+      }
+    });
+  };
+
+  const handleEnableNotifications = async () => {
+    await enableNotifications();
+    checkNotify();
+  };
+
   return (
     <div>
       <h2>
@@ -57,6 +84,7 @@ export default function SettingsPage() {
       </h2>
       <br />
       <form onSubmit={save}>
+        <h3>{t("usersettings")}</h3>
         <label htmlFor="desc">{t("description")}</label>
         <input
           className="search"
@@ -74,6 +102,15 @@ export default function SettingsPage() {
           {t("save")}
         </button>
       </form>
+      <br />
+      <h3>{t("appsettings")}</h3>
+      <button
+        className="chat-prev center"
+        disabled={isNotify == "granted"}
+        onClick={handleEnableNotifications}
+      >
+        {isNotify ? t("notificationsenabled") : t("enablenotifications")}
+      </button>
     </div>
   );
 }

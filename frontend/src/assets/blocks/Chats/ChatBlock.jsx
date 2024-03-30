@@ -4,7 +4,7 @@ import { AuthContext, TranslationContext } from "../../contexts/contexts";
 import { decrypt } from "../../scripts/encryption";
 import { genSysText } from "../../scripts/procesSystem";
 import { now, toLocalTime, toTime, toTodaysTime } from "../../scripts/time";
-import { AdminBadge, VerifiedBadge } from "../Users/UserBadges";
+import UserBadges from "../Users/UserBadges";
 
 const ChatBlock = forwardRef(({ chatData, noLinks, onClick }, ref) => {
   const { t, ts } = useContext(TranslationContext);
@@ -26,8 +26,7 @@ const ChatBlock = forwardRef(({ chatData, noLinks, onClick }, ref) => {
             <h2 style={{ fontSize: "24px" }}>
               {chatData.isGroup ? "g." : "u."}
               {chatData.name}
-              {chatData.isVerified ? <VerifiedBadge /> : ""}
-              {chatData.isAdmin ? <AdminBadge /> : ""}
+              <UserBadges user={chatData} />
             </h2>
             <p
               style={chatData.isUnread ? { color: "var(--redcolor)" } : {}}

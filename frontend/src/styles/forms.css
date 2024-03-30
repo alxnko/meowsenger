@@ -15,9 +15,9 @@ textarea {
 input {
   /* width: 95%; */
   margin: 5px 0;
-  background-color: var(--blurcolor);
+  background-color: var(--hovercolor);
   padding: 5px 10px;
-  color: var(--pcolor);
+  color: var(--bgcolor) !important;
   border: none;
   border-radius: 5px;
   font-size: 24px;

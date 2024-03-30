@@ -7,10 +7,7 @@ import Message from "../../assets/blocks/Messages/Message";
 import MessageInput from "../../assets/blocks/Messages/MessageInput";
 import PopUp from "../../assets/blocks/PopUps/PopUp";
 import TPopUp from "../../assets/blocks/PopUps/TPopUp";
-import {
-  AdminBadge,
-  VerifiedBadge,
-} from "../../assets/blocks/Users/UserBadges";
+import UserBadges from "../../assets/blocks/Users/UserBadges";
 import UserBlock from "../../assets/blocks/Users/UserBlock";
 import { useInterval } from "../../assets/blocks/hooks/useInterval";
 import useOnScreen from "../../assets/blocks/hooks/useOnScreen";
@@ -36,6 +33,8 @@ export default function Chat() {
 
   const [chat, setChat] = useState(undefined);
   let chatId = undefined;
+  let canSendMsg = true;
+  let canUpdateMsgs = true;
   const [messages, setMessages] = useState(undefined);
   const [last, setLast] = useState(undefined);
 
@@ -253,6 +252,13 @@ export default function Chat() {
     el.scrollTop = val;
   }
 
+  useInterval(
+    () => {
+      fetchChat();
+    },
+    chat ? 600000 : 500
+  );
+
   useInterval(() => {
     fetchData();
   }, 500);
@@ -273,12 +279,12 @@ export default function Chat() {
       .then((res) => {
         if (res.status != "200") {
           setIsLoader(true);
-          return [];
+          return false;
         }
         return res.json();
       })
       .then((data) => {
-        setChatData(data);
+        if (data) setChatData(data);
       });
   };
 
@@ -331,21 +337,28 @@ export default function Chat() {
     secret = chat.secret,
     isForwarded = false
   ) => {
-    let dict = {
-      id: id,
-      text: encrypt(text, secret),
-    };
-    if (isForwarded || id != chat.id) {
-      dict.isForwarded = true;
-    } else if (replyMsg) {
-      dict.replyTo = replyMsg.id;
-    }
-    fetch("/api/m/send", createPostData(dict));
-    setReplyMsg(undefined);
+    if (canSendMsg) {
+      canSendMsg = false;
+      let dict = {
+        id: id,
+        text: encrypt(text, secret),
+      };
+      if (isForwarded || id != chat.id) {
+        dict.isForwarded = true;
+      } else if (replyMsg) {
+        dict.replyTo = replyMsg.id;
+      }
+      fetch("/api/m/send", createPostData(dict)).then(() => {
+        canSendMsg = true;
+      });
+      if (replyMsg) setReplyMsg(undefined);
+      return true;
+    } else return false;
   };
 
   const fetchData = () => {
-    if (chat) {
+    if (chat && canUpdateMsgs) {
+      canUpdateMsgs = false;
       fetch(
         "/api/m/get_new",
         createPostData({
@@ -365,6 +378,7 @@ export default function Chat() {
         })
         .then((data) => {
           setMessagesData(data);
+          canUpdateMsgs = true;
         });
     } else {
       return [];
@@ -452,15 +466,15 @@ export default function Chat() {
         <div style={{ maxWidth: "350px" }} className="flex">
           <button
             onClick={() => setDeleteConfirmOpen(false)}
-            className="chat-prev"
-            style={{ marginRight: "5px" }}
+            className="chat-prev center"
+            style={{ marginRight: "5px", width: "200px" }}
           >
             {t("no")}
           </button>
           <button
             onClick={deleteMessage}
-            className="chat-prev"
-            style={{ marginLeft: "5px" }}
+            className="chat-prev center"
+            style={{ marginLeft: "5px", width: "200px" }}
           >
             {t("yes")}
           </button>
@@ -488,6 +502,7 @@ export default function Chat() {
               <>
                 <button
                   onClick={() => {
+                    if (isEdit) setEdit(undefined);
                     setReplyMsg(currentMsg);
                     setMsgMenuOpen(false);
                   }}
@@ -509,6 +524,7 @@ export default function Chat() {
                     Date.now() - 1800000 ? (
                       <button
                         onClick={() => {
+                          if (replyMsg) setReplyMsg(undefined);
                           setEdit(true);
                           setMsgMenuOpen(false);
                         }}
@@ -649,8 +665,7 @@ export default function Chat() {
                 ? " g." + chat.name
                 : "u." + chat.name
               : t("loading") + "..."}
-            {chat && chat.isVerified ? <VerifiedBadge /> : ""}
-            {chat && chat.isAdmin ? <AdminBadge /> : ""}
+            <UserBadges user={chat} />
           </h2>
         </div>
         <div

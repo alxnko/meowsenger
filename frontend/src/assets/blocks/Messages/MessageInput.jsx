@@ -17,24 +17,25 @@ export default function MessageInput({
   const [text, setText] = useState("");
   useEffect(() => {
     if (isEdit && currentMsg) setText(decrypt(currentMsg.text, secret));
+    else setText("");
   }, [isEdit]);
 
   const sendMessage = (e) => {
     e.preventDefault();
+    let txt = text;
     if (isEdit) {
-      editMsg(text);
+      editMsg(txt);
     } else {
-      if (text.trim() != "") {
-        sendMsg(text);
+      if (txt.trim() != "") {
+        if (sendMsg(txt)) setText("");
       }
     }
-    setText("");
   };
   return (
     <div className="msg-form fw fwc">
       {replyTo ? (
         <div className="flex jc-sb reply">
-          <p>
+          <p className="under-input-text">
             {t("replyto") +
               " " +
               replyTo.author.username +
@@ -45,7 +46,9 @@ export default function MessageInput({
         </div>
       ) : isEdit ? (
         <div className="flex jc-sb reply">
-          <p>{t("editing") + ": " + decrypt(currentMsg.text, secret)}</p>
+          <p className="under-input-text">
+            {t("editing") + ": " + decrypt(currentMsg.text, secret)}
+          </p>
           <button
             onClick={() => {
               setText("");

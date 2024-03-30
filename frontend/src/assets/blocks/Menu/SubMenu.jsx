@@ -25,6 +25,9 @@ export default function SubMenu({ isOnTop, show, openMenu }) {
   const { user } = useContext(AuthContext);
 
   const logout = () => {
+    navigator.serviceWorker.getRegistration().then((registration) => {
+      registration.unregister();
+    });
     fetch("/api/u/logout")
       .then((res) => {
         if (res.status != "200") {

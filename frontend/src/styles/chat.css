@@ -20,6 +20,9 @@
   margin: 80px 0;
 }
 .msg {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   border-radius: 10px;
   background-color: var(--simplecolor);
   padding: 15px 10px;

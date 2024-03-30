@@ -7,19 +7,22 @@ import secrets
 @login_manager.user_loader
 def load_user(user_id):
     try:
+        upds = Update.query.filter(
+            Update.time <= datetime.now() - timedelta(hours=2))
+        if upds:
+            for upd in upds:
+                db.session.delete(upd)
         msgs = Message.query.filter(
             Message.send_time <= datetime.now() - timedelta(days=14))
-        for msg in msgs:
-            db.session.delete(msg)
+        if msgs:
+            for msg in msgs:
+                db.session.delete(msg)
         msgs = Message.query.filter(
             Message.is_deleted == True,
             Message.send_time <= datetime.now() - timedelta(days=1))
-        for msg in msgs:
-            db.session.delete(msg)
-        upds = Update.query.filter(
-            Update.time <= datetime.now() - timedelta(hours=2))
-        for upd in upds:
-            db.session.delete(upd)
+        if msgs:
+            for msg in msgs:
+                db.session.delete(msg)
         db.session.commit()
     except:
         pass
@@ -40,6 +43,7 @@ class User(db.Model, UserMixin):
     is_admin = db.Column(db.Boolean, default=False)
     password = db.Column(db.String(60), nullable=False)
     messages = db.relationship('Message', backref='author', lazy=True)
+    notifies = db.relationship('Notify', backref='user', lazy=True)
     reg_time = db.Column(db.DateTime, nullable=False, default=datetime.now)
     chats = db.relationship("Chat", secondary='user_chat',
                             lazy='subquery', back_populates="users")
@@ -89,6 +93,12 @@ class Update(db.Model):
     message_id = db.Column(db.Integer, db.ForeignKey(
         'message.id'), nullable=False)
     time = db.Column(db.DateTime, nullable=False, default=datetime.now)
+
+
+class Notify(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    subscription = db.Column(db.Text, nullable=False)
 
 
 user_chat = db.Table(

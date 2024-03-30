@@ -5,6 +5,7 @@ import { AuthContext } from "../../contexts/contexts";
 export default function IsAuth() {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
+
   useEffect(() => {
     if (user && user == "unAuth") {
       navigate("/login");

@@ -1,0 +1,21 @@
+.notification {
+  position: fixed;
+  margin-top: 90px;
+  width: 100vw;
+  z-index: 999;
+}
+.notification .body {
+  margin: auto;
+  max-width: 350px;
+  transform: translateX(-1%);
+  padding: 10px;
+  background-color: var(--hovercolor);
+}
+.notification .body p,
+.notification .body h2 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 350px;
+  color: var(--bgcolor);
+}

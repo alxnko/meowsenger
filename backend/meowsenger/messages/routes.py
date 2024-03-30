@@ -2,6 +2,7 @@ from flask import request, Blueprint
 from flask_login import current_user, login_required
 from meowsenger.models import Chat, User, Message, Update
 from meowsenger.users.routes import user_to_dict
+from meowsenger.notifications.routes import send_notification_to_chat_users
 from meowsenger import db
 from datetime import datetime
 import time
@@ -40,12 +41,12 @@ def messages_to_arr(messages):
         return [message_to_dict(msg) for msg in messages if not msg.is_deleted]
 
 
-def messages_to_arr_from(chat, frm=1, to=50):
-    messages = [msg for msg in chat.messages if not msg.is_deleted]
-    if frm == 1:
-        return [message_to_dict(msg) for msg in messages[-to:]]
-    else:
-        return [message_to_dict(msg) for msg in messages[-to:-frm]]
+def messages_to_arr_from(chat_id, offset=0, limit=50):
+    query = Message.query.filter(Message.chat_id == chat_id, Message.is_deleted == False).order_by(
+        Message.id.desc()).offset(offset)
+    messages = query.limit(limit).all()
+    messages.reverse()
+    return [message_to_dict(msg) for msg in messages]
 
 
 def updates_to_arr(updates):
@@ -66,7 +67,7 @@ def get_new():
         updates = Update.query.filter(
             Update.chat_id == chat_id, Update.time > datetime.fromtimestamp(last)).all()
         old = messages_to_arr_from(
-            chat, data["msgs"]+1, data["msgs"]+51) if data["loadOld"] and Message.query.filter(Message.chat_id == chat_id, Message.is_deleted == False).count() > data["loadOld"] else None
+            chat.id, data["msgs"]+1) if data["loadOld"] and Message.query.filter(Message.chat_id == chat_id, Message.is_deleted == False).count() > data["loadOld"] else None
         if messages or updates or old:
             mark_as_read(messages)
             last = time.mktime(chat.last_time.timetuple())
@@ -97,6 +98,10 @@ def send_msg():
         chat.last_time = message.send_time
         db.session.add(chat)
         db.session.commit()
+        send_notification_to_chat_users(chat,
+                                        (f"({chat.name}){current_user.username}"
+                                         if chat.is_group else f"{current_user.username}")
+                                        + ":" + text + ":" + chat.secret + ":" + str(chat.id))
         return {"status": True}
     return {"status": False, "reason": "not in chat"}
 

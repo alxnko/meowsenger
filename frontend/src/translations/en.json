@@ -33,6 +33,8 @@
 
   "all": "all",
   "search": "search",
+  "why": "why",
+  "or": "or",
 
   "you": "you",
 
@@ -70,9 +72,20 @@
 
   "admin": "admin",
   "verified": "verified",
+  "tester": "tester",
+
+  "areyousure": "are you sure?",
+  "yes": "yes",
+  "no": "no",
 
   "settings": "settings",
   "save": "save",
+
+  "usersettings": "user settings",
+  "appsettings": "app settings",
+
+  "enablenotifications": "enable notifications",
+  "notificationsenabled": "notifications enabled",
 
   "deletegroup": "delete group",
 

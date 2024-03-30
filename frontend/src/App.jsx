@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Tooltip } from "react-tooltip";
 import Layout from "./assets/blocks/Layout";
+import { useInterval } from "./assets/blocks/hooks/useInterval";
 import {
   AuthContext,
   LoaderContext,
@@ -26,6 +27,12 @@ export default function App() {
   const [isLoader, setIsLoader] = useState(true);
   const [user, setUser] = useState(undefined);
   const [menu, setMenu] = useState(undefined);
+  useInterval(
+    () => {
+      fetchUser();
+    },
+    user ? 60000 : 500
+  );
   useEffect(() => {
     setTrueVH();
     DetectTheme();

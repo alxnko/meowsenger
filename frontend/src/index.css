@@ -6,6 +6,7 @@
 @import "./styles/loader.css";
 @import "./styles/popup.css";
 @import "./styles/tooltip.css";
+@import "./styles/notification.css";
 
 @import "./styles/scrollbar.css";
 @import "./styles/text.css";
@@ -16,7 +17,7 @@
 
 :root {
   --bgcolor: black;
-  --hovercolor: aliceblue;
+  --hovercolor: #dceeff;
   --simplecolor: #222222;
   --simplecolorop: #222222cc;
   --sbgcolor: black;
