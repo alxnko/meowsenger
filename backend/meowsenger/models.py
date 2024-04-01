@@ -16,12 +16,18 @@ def load_user(user_id):
             Message.send_time <= datetime.now() - timedelta(days=14))
         if msgs:
             for msg in msgs:
+                for reply in msg.replies:
+                    reply.reply_to = None
+                    db.session.add(reply)
                 db.session.delete(msg)
         msgs = Message.query.filter(
             Message.is_deleted == True,
             Message.send_time <= datetime.now() - timedelta(days=1))
         if msgs:
             for msg in msgs:
+                for reply in msg.replies:
+                    reply.reply_to = None
+                    db.session.add(reply)
                 db.session.delete(msg)
         db.session.commit()
     except:
@@ -81,7 +87,7 @@ class Message(db.Model):
     send_time = db.Column(db.DateTime, nullable=False, default=datetime.now)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     chat_id = db.Column(db.Integer, db.ForeignKey('chat.id'), nullable=False)
-    reply_to = db.Column(db.Integer, db.ForeignKey('message.id'))
+    reply_to = db.Column(db.Integer)
     is_forwarded = db.Column(db.Boolean, default=False)
     unread_by = db.relationship("User", secondary='user_message',
                                 lazy='subquery', back_populates="unread")

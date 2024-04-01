@@ -20,6 +20,9 @@ blocks
 .w4 {
   width: 80px;
 }
+.w3 {
+  width: 110px;
+}
 .container {
   display: flex;
 }

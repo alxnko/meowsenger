@@ -81,19 +81,33 @@ export default function Message({
         className="flsb"
         style={{ flexDirection: isMine ? "row" : "row-reverse" }}
       >
-        <p className="time">
-          {time
-            ? time.toDateString() != now.toDateString()
-              ? toTime(time)
-              : toTodaysTime(time)
-            : ""}
-          {message && message.isForwarded ? <BiSolidShare /> : ""}
-          {message && message.isEdited ? <BiSolidEditAlt /> : ""}
-        </p>
-        <p className="time">
-          {message ? message.author.username : ""}{" "}
-          <UserBadges user={message ? message.author : {}} />
-        </p>
+        <div
+          className="flsb"
+          style={{ flexDirection: isMine ? "row" : "row-reverse" }}
+        >
+          <p className="time">
+            {time
+              ? time.toDateString() != now.toDateString()
+                ? toTodaysTime(time) //toTime(time)
+                : toTodaysTime(time)
+              : ""}
+          </p>
+          <p className="time">
+            {message && message.isForwarded ? <BiSolidShare /> : ""}
+          </p>
+          <p className="time">
+            {message && message.isEdited ? <BiSolidEditAlt /> : ""}
+          </p>
+        </div>
+        <div
+          className="flsb"
+          style={{ flexDirection: isMine ? "row" : "row-reverse" }}
+        >
+          <p className="time">
+            <UserBadges user={message ? message.author : {}} />
+          </p>
+          <p className="time">{message ? message.author.username : ""} </p>
+        </div>
       </div>
       {message && message.replyTo ? (
         <div className="reply">
@@ -108,10 +122,17 @@ export default function Message({
                   : toTodaysTime(replyTime)
                 : ""}
             </p>
-            <p className="time">
-              {message ? message.replyTo.author.username : ""}{" "}
-              <UserBadges user={message ? message.replyTo.author : {}} />
-            </p>
+            <div
+              className="flsb"
+              style={{ flexDirection: isMine ? "row" : "row-reverse" }}
+            >
+              <p className="time">
+                <UserBadges user={message ? message.replyTo.author : {}} />
+              </p>
+              <p className="time">
+                {message ? message.replyTo.author.username : ""}{" "}
+              </p>
+            </div>
           </div>
           {decrypt(message.replyTo.text, secret)}
         </div>

@@ -38,6 +38,9 @@ a.link:hover {
 .time {
   font-size: 11px;
 }
+.date {
+  margin: 10px 0;
+}
 .blur {
   background: var(--blurcolor);
   backdrop-filter: saturate(180%) blur(10px);

@@ -10,7 +10,7 @@ export default function ChatFilter({ filter, setFilter }) {
         <button
           onClick={() => setFilter("")}
           style={{ marginRight: "5px" }}
-          className="chat-prev center w4"
+          className="chat-prev center w3"
         >
           {t("all")}
         </button>
@@ -19,27 +19,18 @@ export default function ChatFilter({ filter, setFilter }) {
         <button
           onClick={() => setFilter("u")}
           style={{ marginLeft: "5px", marginRight: "5px" }}
-          className="chat-prev center w4"
+          className="chat-prev center w3"
         >
-          {t("u.")}
+          u.
         </button>
       </Link>
       <Link className={filter == "g" ? "active" : ""}>
         <button
           onClick={() => setFilter("g")}
           style={{ marginLeft: "5px", marginRight: "5px" }}
-          className="chat-prev center w4"
+          className="chat-prev center w3"
         >
-          {t("g.")}
-        </button>
-      </Link>
-      <Link className={filter == "c" ? "active" : ""}>
-        <button
-          onClick={() => setFilter("c")}
-          style={{ marginLeft: "5px" }}
-          className="chat-prev center w4"
-        >
-          {t("c.")}
+          g.
         </button>
       </Link>
     </div>

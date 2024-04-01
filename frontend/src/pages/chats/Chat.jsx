@@ -1,10 +1,12 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import IsAuth from "../../assets/blocks/Auth/IsAuth";
-import ChatList from "../../assets/blocks/Chats/ChatList";
 import GroupBlock from "../../assets/blocks/Chats/GroupBlock";
+import MessageDeleteConfirmMenu from "../../assets/blocks/Messages/Menus/MessageDeleteConfirmMenu";
+import MessageForwardMenu from "../../assets/blocks/Messages/Menus/MessageForwardMenu";
 import Message from "../../assets/blocks/Messages/Message";
 import MessageInput from "../../assets/blocks/Messages/MessageInput";
+import MessageList from "../../assets/blocks/Messages/MessageList";
 import PopUp from "../../assets/blocks/PopUps/PopUp";
 import TPopUp from "../../assets/blocks/PopUps/TPopUp";
 import UserBadges from "../../assets/blocks/Users/UserBadges";
@@ -69,36 +71,10 @@ export default function Chat() {
   const [scroll, setScroll] = useState(document.body.scrollHeight);
 
   const [isForwardMenuOpen, setForwardMenuOpen] = useState("");
-  const [chats, setChats] = useState(undefined);
 
   const [isEdit, setEdit] = useState(false);
 
   const [isDeleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-
-  const fetchChats = async () => {
-    await fetch("/api/c/get_chats", createPostData({ lastUpdate: 0, chats: 0 }))
-      .then((res) => {
-        if (res.status != "200") {
-          setIsLoader(true);
-          return [];
-        }
-        setIsLoader(false);
-        return res.json();
-      })
-      .then((data) => {
-        setData(data);
-      });
-  };
-  const setData = (data) => {
-    if (data) {
-      if (data.status) {
-        if ("data" in data) {
-          setChats(data.data);
-        }
-        setIsLoader(false);
-      }
-    }
-  };
 
   const forward = (id, secret) => {
     sendMessage(decrypt(currentMsg.text, chat.secret), id, secret, true);
@@ -132,6 +108,7 @@ export default function Chat() {
         message: encrypt("added " + newUsername, chat.secret),
       })
     );
+    setAddUserOpen(false);
   };
 
   const removeUser = (un) => {
@@ -393,7 +370,7 @@ export default function Chat() {
             if (
               data.messages.filter((msg) => {
                 msg.isSystem;
-              })
+              }).length
             ) {
               fetchChat();
             }
@@ -461,28 +438,16 @@ export default function Chat() {
   return (
     <>
       <IsAuth />
-      <PopUp show={isDeleteConfirmOpen} setIsShow={setDeleteConfirmOpen}>
-        <h2 className="center">{t("areyousure")}</h2>
-        <div style={{ maxWidth: "350px" }} className="flex">
-          <button
-            onClick={() => setDeleteConfirmOpen(false)}
-            className="chat-prev center"
-            style={{ marginRight: "5px", width: "200px" }}
-          >
-            {t("no")}
-          </button>
-          <button
-            onClick={deleteMessage}
-            className="chat-prev center"
-            style={{ marginLeft: "5px", width: "200px" }}
-          >
-            {t("yes")}
-          </button>
-        </div>
-      </PopUp>
-      <PopUp show={isForwardMenuOpen} setIsShow={setForwardMenuOpen}>
-        <ChatList chats={chats} noLinks={true} onClick={forward} />
-      </PopUp>
+      <MessageDeleteConfirmMenu
+        show={isDeleteConfirmOpen}
+        setIsShow={setDeleteConfirmOpen}
+        deleteMessage={deleteMessage}
+      />
+      <MessageForwardMenu
+        show={isForwardMenuOpen}
+        setIsShow={setForwardMenuOpen}
+        forward={forward}
+      />
       <TPopUp show={isMsgMenuOpen} setIsShow={setMsgMenuOpen}>
         <div>
           <Message message={currentMsg} secret={chat ? chat.secret : ""} />
@@ -511,7 +476,6 @@ export default function Chat() {
                 </button>
                 <button
                   onClick={() => {
-                    fetchChats();
                     setForwardMenuOpen(true);
                     setMsgMenuOpen(false);
                   }}
@@ -673,22 +637,15 @@ export default function Chat() {
           className="messages"
         >
           <div ref={topMessage}></div>
-          {messages ? (
-            messages.map((message, index) =>
-              !message.isDeleted ? (
-                <Message
-                  key={message.id}
-                  openContextMenu={() => openMsgContextMenu(index)}
-                  message={message}
-                  secret={chat.secret}
-                />
-              ) : (
-                ""
-              )
-            )
-          ) : (
-            <p className="msg msg-info">{t("startchatting")}</p>
-          )}
+          <MessageList
+            messages={messages}
+            topMessage={topMessage}
+            scrollTo={scroll}
+            openMessageMenu={openMsgContextMenu}
+            chat={chat}
+            replyMsg={replyMsg}
+            isEdit={isEdit}
+          />
           <div ref={scrollTo}></div>
         </div>
         {chat ? (
