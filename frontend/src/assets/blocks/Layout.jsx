@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { AuthContext, LoaderContext } from "../contexts/contexts";
-import { enableNotifications } from "../scripts/notifications";
 import Loader from "./Loader/Loader";
 import Menu from "./Menu/Menu";
 import SubMenu from "./Menu/SubMenu";
@@ -19,27 +18,11 @@ export default function Layout() {
 
   const notifications = new BroadcastChannel("notifications");
 
-  async function ask() {
-    if (
-      user &&
-      user != "unAuth" &&
-      !localStorage.hasOwnProperty("notifyAsked")
-    ) {
-      await enableNotifications();
-      localStorage.setItem("notifyAsked", true);
-    }
-  }
-
-  useEffect(() => {
-    ask();
-  }, []);
-
   useEffect(() => {
     setOnTop(
       window.location.href.includes("/chat/") ||
         window.location.href.includes("/group/")
     );
-    ask();
   }, [navigate]);
 
   notifications.onmessage = (event) => {

@@ -105,7 +105,7 @@ export default function Chats() {
         >
           {t("newgroup")}
         </button>
-        <button
+        {/* <button
           onClick={() => {
             setIsCreateMenuOpen(false);
             // setIsNewChannelOpen(true);
@@ -113,7 +113,7 @@ export default function Chats() {
           className="chat-prev center"
         >
           {t("newchannel")}
-        </button>
+        </button> */}
       </PopUp>
       <p className="center">{t("chatlist")}</p>
       <div>
