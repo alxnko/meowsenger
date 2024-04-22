@@ -28,7 +28,7 @@ def mark_as_not_read(chat, msg):
 
 
 def get_last_message(chat_id):
-    return Message.query.filter_by(chat_id=chat_id).order_by(Message.id.desc()).first()
+    return Message.query.filter(Message.chat_id == chat_id, Message.is_deleted == False).order_by(Message.id.desc()).first()
 
 
 def chat_to_block_dict(chat: Chat):

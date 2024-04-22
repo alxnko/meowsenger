@@ -6,32 +6,34 @@ import secrets
 
 @login_manager.user_loader
 def load_user(user_id):
-    try:
-        upds = Update.query.filter(
-            Update.time <= datetime.now() - timedelta(hours=2))
-        if upds:
-            for upd in upds:
-                db.session.delete(upd)
-        msgs = Message.query.filter(
-            Message.send_time <= datetime.now() - timedelta(days=14))
-        if msgs:
-            for msg in msgs:
-                for reply in msg.replies:
-                    reply.reply_to = None
-                    db.session.add(reply)
-                db.session.delete(msg)
-        msgs = Message.query.filter(
-            Message.is_deleted == True,
-            Message.send_time <= datetime.now() - timedelta(days=1))
-        if msgs:
-            for msg in msgs:
-                for reply in msg.replies:
-                    reply.reply_to = None
-                    db.session.add(reply)
-                db.session.delete(msg)
-        db.session.commit()
-    except:
-        pass
+    upds = Update.query.filter(
+        Update.time <= datetime.now() - timedelta(hours=2))
+    if upds:
+        for upd in upds:
+            db.session.delete(upd)
+    msgs = Message.query.filter(
+        Message.send_time <= datetime.now() - timedelta(days=14))
+    if msgs:
+        for msg in msgs:
+            replies = Message.query.filter(Message.reply_to == msg.id)
+            for reply in replies:
+                reply.reply_to = None
+                db.session.add(reply)
+            db.session.delete(msg)
+    msgs = Message.query.filter(
+        Message.is_deleted == True,
+        Message.send_time <= datetime.now() - timedelta(days=1))
+    if msgs:
+        for msg in msgs:
+            updates = Update.query.filter(Update.message_id == msg.id)
+            for update in updates:
+                db.session.delete(update)
+            replies = Message.query.filter(Message.reply_to == msg.id)
+            for reply in replies:
+                reply.reply_to = None
+                db.session.add(reply)
+            db.session.delete(msg)
+    db.session.commit()
     try:
         return User.query.get(int(user_id))
     except:
