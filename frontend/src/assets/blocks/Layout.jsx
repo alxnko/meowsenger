@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { AuthContext, LoaderContext } from "../contexts/contexts";
+import { LoaderContext } from "../contexts/contexts";
 import Loader from "./Loader/Loader";
 import Menu from "./Menu/Menu";
 import SubMenu from "./Menu/SubMenu";
@@ -8,7 +8,6 @@ import Notification from "./Messages/Notification";
 
 export default function Layout() {
   const { isLoader } = useContext(LoaderContext);
-  const { user } = useContext(AuthContext);
   const [isMenuOpen, openMenu] = useState(false);
   const [isOnTop, setOnTop] = useState(window.location.href.includes("/chat/"));
   const [updateMessage, setUpdateMessage] = useState(undefined);
