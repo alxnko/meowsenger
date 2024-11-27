@@ -80,7 +80,6 @@ def getUser(username):
 def saveSettings():
     data = request.get_json()
     user = User.query.filter_by(username=current_user.username).first()
-    print(data)
     if "description" in data:
         user.description = data["description"]
     db.session.add(user)

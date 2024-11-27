@@ -31,18 +31,23 @@ export default function Chats() {
 
   const [isNewChatOpen, setIsNewChatOpen] = useState(false);
   const [isNewGroupOpen, setIsNewGroupOpen] = useState(false);
-
   const [isCreateMenuOpen, setIsCreateMenuOpen] = useState(false);
+
+  // Add a new state to track fetching
+  const [isFetching, setIsFetching] = useState(false);
 
   useEffect(() => {
     const path = window.location.pathname.split("/");
-    const isMain = path[path.length - 1] == "chats";
+    const isMain = path[path.length - 1] === "chats";
     setFilter(isMain ? undefined : path[path.length - 1]);
     setIsMain(isMain);
   }, [navigate]);
 
-  useInterval(async () => {
-    fetchData();
+  useInterval(() => {
+    // Only fetch if not currently fetching
+    if (!isFetching) {
+      fetchData();
+    }
   }, 500);
 
   useEffect(() => {
@@ -51,12 +56,13 @@ export default function Chats() {
 
   const fetchData = async () => {
     if (user) {
+      setIsFetching(true); // Start fetching
       await fetch(
         "/api/c/get_chats",
         createPostData({ lastUpdate: lastUpdate, chats: chatsLen })
       )
         .then((res) => {
-          if (res.status != "200") {
+          if (res.status !== 200) {
             setIsLoader(true);
             return [];
           }
@@ -65,19 +71,21 @@ export default function Chats() {
         })
         .then((data) => {
           setData(data);
+        })
+        .finally(() => {
+          setIsFetching(false); // Finish fetching
         });
     }
   };
+
   const setData = (data) => {
-    if (data) {
-      if (data.status) {
-        if ("data" in data) {
-          setChats(data.data);
-          chatsLen = data.data.length;
-        }
-        lastUpdate = parseInt(data.time);
-        setIsLoader(false);
+    if (data && data.status) {
+      if ("data" in data) {
+        setChats(data.data);
+        chatsLen = data.data.length;
       }
+      lastUpdate = parseInt(data.time, 10);
+      setIsLoader(false);
     }
   };
 
@@ -105,15 +113,6 @@ export default function Chats() {
         >
           {t("newgroup")}
         </button>
-        {/* <button
-          onClick={() => {
-            setIsCreateMenuOpen(false);
-            // setIsNewChannelOpen(true);
-          }}
-          className="chat-prev center"
-        >
-          {t("newchannel")}
-        </button> */}
       </PopUp>
       <p className="center">{t("chatlist")}</p>
       <div>

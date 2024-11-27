@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from meowsenger import db, login_manager
 from flask_login import UserMixin
 import secrets
@@ -6,37 +6,32 @@ import secrets
 
 @login_manager.user_loader
 def load_user(user_id):
-    upds = Update.query.filter(
-        Update.time <= datetime.now() - timedelta(hours=2))
-    if upds:
-        for upd in upds:
-            db.session.delete(upd)
-    msgs = Message.query.filter(
-        Message.send_time <= datetime.now() - timedelta(days=14))
-    if msgs:
-        for msg in msgs:
-            replies = Message.query.filter(Message.reply_to == msg.id)
-            for reply in replies:
-                reply.reply_to = None
-                db.session.add(reply)
-            db.session.delete(msg)
-    msgs = Message.query.filter(
-        Message.is_deleted == True,
-        Message.send_time <= datetime.now() - timedelta(days=1))
-    if msgs:
-        for msg in msgs:
-            updates = Update.query.filter(Update.message_id == msg.id)
-            for update in updates:
-                db.session.delete(update)
-            replies = Message.query.filter(Message.reply_to == msg.id)
-            for reply in replies:
-                reply.reply_to = None
-                db.session.add(reply)
-            db.session.delete(msg)
-    db.session.commit()
     try:
+        # Delete old records from the `update` table
+        db.session.execute(
+            "DELETE FROM `update` WHERE time <= NOW() - INTERVAL 2 HOUR;"
+        )
+
+        # Delete records from the message table with specific conditions
+        db.session.execute(
+            """
+            DELETE FROM message
+            WHERE send_time <= NOW() - INTERVAL 14 DAY OR
+            (is_deleted AND send_time <= NOW() - INTERVAL 1 DAY);
+            """
+        )
+
+        db.session.commit()
+
+    except Exception as e:
+        db.session.rollback()  # Roll back on error
+        print("An error occurred while executing the queries: ", e)
+
+    try:
+        # Fetch the User object
         return User.query.get(int(user_id))
-    except:
+    except Exception as e:
+        print("An error occurred while fetching the user: ", e)
         return None
 
 

@@ -26,11 +26,13 @@ def create_app():
     from meowsenger.users.routes import users
     from meowsenger.messages.routes import messages
     from meowsenger.notifications.routes import notifications
+    from meowsenger.admin.routes import admin
 
     app.register_blueprint(chats)
     app.register_blueprint(users)
     app.register_blueprint(messages)
     app.register_blueprint(notifications)
+    app.register_blueprint(admin)
 
     with app.app_context():
         db.create_all()
