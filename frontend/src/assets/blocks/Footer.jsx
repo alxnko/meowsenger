@@ -6,7 +6,7 @@ export default function Footer() {
       <p>meowsenger</p>
       <h3>
         by
-        <a className="link" href="https://alxnko.likesyou.org">
+        <a className="link" href="https://github.com/alxnko">
           alxnko
         </a>
       </h3>

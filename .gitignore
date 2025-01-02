@@ -2,4 +2,4 @@
 .flaskenv
 /backend/migrations
 __pychache__
-.pyc
+*.pyc

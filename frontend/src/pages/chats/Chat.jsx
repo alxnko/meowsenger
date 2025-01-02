@@ -59,7 +59,7 @@ export default function Chat() {
 
   const [replyMsg, setReplyMsg] = useState(undefined);
 
-  const [isFirst, setIsFirst] = useState(true);
+  const [isFirst, setIsFirst] = useState(2);
 
   const [isAddUserOpen, setAddUserOpen] = useState(false);
   const [newUsername, setNewUsername] = useState("");
@@ -205,7 +205,7 @@ export default function Chat() {
   useEffect(() => {
     if (!isTopMessageVisible || isFirst) {
       scrollToEnd();
-      setIsFirst(false);
+      setIsFirst((prev) => prev - 1);
     } else {
       scrollToTop();
       setIsLoader(false);
