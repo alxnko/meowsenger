@@ -62,6 +62,7 @@ class User(db.Model, UserMixin):
 class Chat(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     is_group = db.Column(db.Boolean, default=False)
+    is_channel = db.Column(db.Boolean, default=False)
     name = db.Column(db.String(20))
     messages = db.relationship('Message', backref='chat', lazy=True)
     updates = db.relationship('Update', backref='chat', lazy=True)
@@ -71,6 +72,7 @@ class Chat(db.Model):
     admins = db.relationship("User", secondary='admin_chat',
                              lazy='subquery', back_populates="manage")
     is_verified = db.Column(db.Boolean, default=False)
+    is_public = db.Column(db.Boolean, default=True)
     secret = db.Column(db.String(64), default=secrets.token_hex(16))
     last_time = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
