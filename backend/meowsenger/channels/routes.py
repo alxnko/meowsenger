@@ -2,7 +2,8 @@ from flask import request, Blueprint
 from flask_login import current_user, login_required
 from meowsenger.models import Chat, User, Message
 from meowsenger.chats.routes import mark_as_read, chat_to_dict, chat_to_block_dict
-from meowsenger.messages.routes import messages_to_arr_from, send_notification_to_chat_users
+from meowsenger.messages.routes import messages_to_arr_from
+from meowsenger.notifications.routes import send_notification_to_chat_users
 from meowsenger.users.routes import user_to_dict
 from meowsenger import db
 import time
