@@ -32,16 +32,16 @@ def get_last_message(chat_id):
 
 
 def chat_to_block_dict(chat: Chat):
-    name = chat.name if chat.is_group else current_user.username if len(chat.users) == 1 else [
+    name = chat.name if (chat.is_group or chat.is_channel) else current_user.username if len(chat.users) == 1 else [
         i for i in chat.users if i.username != current_user.username][0].username
-    user = None if chat.is_group else User.query.filter_by(
+    user = None if (chat.is_group or chat.is_channel) else User.query.filter_by(
         username=name).first()
     last_message = get_last_message(chat.id)
     return {
         "id": chat.id,
         "name": name,
         "secret": chat.secret,
-        "isVerified": chat.is_verified if chat.is_group else user.is_verified,
+        "isVerified": chat.is_verified if (chat.is_group or chat.is_channel) else user.is_verified,
         "isAdmin": True if user and user.is_admin else False,
         "isTester": True if user and user.is_tester else False,
         "lastMessage":
@@ -51,30 +51,32 @@ def chat_to_block_dict(chat: Chat):
             if last_message else
             {"text": "no messages",
              "author": "", },
-        "url": chat.id if chat.is_group else name,
-        "type": "g" if chat.is_group else "u",
+        "url": chat.id if (chat.is_group or chat.is_channel) else name,
+        "type": "ch" if chat.is_channel else ("g" if chat.is_group else "u"),
         "isGroup": chat.is_group,
+        "isChannel": chat.is_channel,
         "lastUpdate": chat.last_time,
         "isUnread": (current_user in chat.messages[-1].unread_by) if chat.messages else False,
     }
 
 
 def chat_to_dict(chat: Chat):
-    name = chat.name if chat.is_group else current_user.username if len(chat.users) == 1 else [
+    name = chat.name if (chat.is_group or chat.is_channel) else current_user.username if len(chat.users) == 1 else [
         i for i in chat.users if i.username != current_user.username][0].username
-    user = None if chat.is_group else User.query.filter_by(
+    user = None if (chat.is_group or chat.is_channel) else User.query.filter_by(
         username=name).first()
     return {
         "id": chat.id,
         "name": name,
         "desc": chat.description,
         "secret": chat.secret,
-        "isVerified": chat.is_verified if chat.is_group else user.is_verified,
+        "isVerified": chat.is_verified if (chat.is_group or chat.is_channel) else user.is_verified,
         "isAdmin": True if user and user.is_admin else False,
         "isTester": True if user and user.is_tester else False,
-        "users": ([user_to_dict(i) for i in chat.users] if chat.is_group else [user_to_dict(i) for i in chat.users if i.username != current_user.username]) if len(chat.users) != 1 else [{"username": current_user.username}],
-        "admins": [i.username for i in chat.admins] if chat.is_group else [],
+        "users": ([user_to_dict(i) for i in chat.users] if (chat.is_group or chat.is_channel) else [user_to_dict(i) for i in chat.users if i.username != current_user.username]) if len(chat.users) != 1 else [{"username": current_user.username}],
+        "admins": [i.username for i in chat.admins] if (chat.is_group or chat.is_channel) else [],
         "isGroup": chat.is_group,
+        "isChannel": chat.is_channel,
         "lastUpdate": chat.last_time,
         "isUnread": (current_user in chat.messages[-1].unread_by) if chat.messages else False,
     }
