@@ -61,6 +61,8 @@ def get_new():
     chat_id = data["id"]
     last = data["last"]
     chat = Chat.query.get(chat_id)
+    if not chat:
+        return {"status": False, "reason": "chat not found"}, 404
     if current_user in chat.users:
         messages = Message.query.filter(
             Message.chat_id == chat_id, Message.send_time > datetime.fromtimestamp(last)).all()
@@ -83,6 +85,8 @@ def send_msg():
     data = request.json
     chat_id = data["id"]
     chat = Chat.query.get(chat_id)
+    if not chat:
+        return {"status": False, "reason": "chat not found"}, 404
     is_system = data["isSystem"] if "isSystem" in data else False
     reply_to = data["replyTo"] if "replyTo" in data else None
     is_forwarded = data["isForwarded"] if "isForwarded" in data else None
@@ -91,8 +95,10 @@ def send_msg():
         return {"status": False, "reason": "not in chat"}
     
     # Check if this is a channel and user has permission to post
-    if chat.is_channel and current_user not in chat.admins:
+    if chat.is_channel and (current_user not in chat.admins and current_user.id != chat.owner_id):
         return {"status": False, "reason": "only admins can post to channels"}
+    if chat.is_channel and is_system:
+        return {"status": False, "reason": "system messages are not allowed in channels"}
     
     text = data["text"]
     message = Message(text=text, user_id=current_user.id, reply_to=reply_to, is_forwarded=is_forwarded,
@@ -118,6 +124,8 @@ def delete_msg():
     data = request.json
     m_id = data["id"]
     message = Message.query.get(m_id)
+    if not message or current_user not in message.chat.users:
+        return {"status": False}
     if message.author == current_user:
         message.is_deleted = True
         db.session.add(message)
@@ -138,6 +146,8 @@ def edit_msg():
     data = request.json
     m_id = data["id"]
     message = Message.query.get(m_id)
+    if not message or current_user not in message.chat.users:
+        return {"status": False}
     if message.author == current_user:
         message.is_edited = True
         message.text = data["text"]

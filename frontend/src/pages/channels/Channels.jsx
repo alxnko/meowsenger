@@ -31,7 +31,7 @@ export default function Channels() {
     if (!isFetching) {
       fetchChannels();
     }
-  }, 1000);
+  }, 5000);
 
   useEffect(() => {
     setIsLoader(true);

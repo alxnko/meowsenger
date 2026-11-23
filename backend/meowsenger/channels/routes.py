@@ -1,7 +1,7 @@
 from flask import request, Blueprint
 from flask_login import current_user, login_required
 from meowsenger.models import Chat, User, Message
-from meowsenger.chats.routes import mark_as_read, chat_to_dict, chat_to_block_dict
+from meowsenger.chats.routes import mark_as_read
 from meowsenger.messages.routes import messages_to_arr_from
 from meowsenger.notifications.routes import send_notification_to_chat_users
 from meowsenger.users.routes import user_to_dict
@@ -11,8 +11,16 @@ import time
 channels = Blueprint('channels', __name__)
 
 
-def channel_to_dict(channel: Chat):
+def channel_user_is_admin(channel: Chat, user: User):
+    return user.id == channel.owner_id or user in channel.admins
+
+
+def channel_to_dict(channel: Chat, subscribers_offset=0, subscribers_limit=50):
     """Convert a channel to dictionary format"""
+    users = channel.users if channel.users else []
+    total_subscribers = len(users)
+    subscribers = users[subscribers_offset:subscribers_offset + subscribers_limit]
+    owner = User.query.get(channel.owner_id) if channel.owner_id else None
     return {
         "id": channel.id,
         "name": channel.name,
@@ -20,10 +28,13 @@ def channel_to_dict(channel: Chat):
         "secret": channel.secret,
         "isVerified": channel.is_verified,
         "isPublic": channel.is_public,
-        "users": [user_to_dict(i) for i in channel.users] if channel.users else [],
+        "users": [user_to_dict(i) for i in subscribers],
+        "subscribersTotal": total_subscribers,
+        "subscribersHasMore": (subscribers_offset + subscribers_limit) < total_subscribers,
         "admins": [i.username for i in channel.admins] if channel.admins else [],
+        "owner": owner.username if owner else None,
         "isChannel": True,
-        "memberCount": len(channel.users) if channel.users else 0,
+        "memberCount": total_subscribers,
         "lastUpdate": channel.last_time,
         "isUnread": (current_user in channel.messages[-1].unread_by) if channel.messages else False,
     }
@@ -62,6 +73,7 @@ def createChannel():
     channel = Chat(
         name=data["name"],
         is_channel=True,
+        owner_id=current_user.id,
         is_public=data.get("isPublic", True),
         description=data.get("description", "meowsenger channel")
     )
@@ -87,12 +99,25 @@ def getChannels():
 def getChannel():
     """Get channel details and messages"""
     data = request.json
+    messages_offset = max(0, int(data.get("messagesOffset", 0)))
+    messages_limit = min(200, max(1, int(data.get("messagesLimit", 50))))
+    subscribers_offset = max(0, int(data.get("subscribersOffset", 0)))
+    subscribers_limit = min(100, max(1, int(data.get("subscribersLimit", 50))))
     channel = Chat.query.get(data['from'])
     if channel and channel.is_channel:
         if current_user in channel.users:
             mark_as_read(channel)
             last = time.mktime(channel.last_time.timetuple())
-            return {"status": True, "channel": channel_to_dict(channel), "messages": messages_to_arr_from(channel.id), "last": last}
+            return {
+                "status": True,
+                "channel": channel_to_dict(
+                    channel,
+                    subscribers_offset=subscribers_offset,
+                    subscribers_limit=subscribers_limit
+                ),
+                "messages": messages_to_arr_from(channel.id, messages_offset, messages_limit),
+                "last": last
+            }
         else:
             return {"status": False, "reason": "not subscribed"}
     return {"status": False}, 404
@@ -105,6 +130,10 @@ def joinChannel():
     data = request.json
     channel = Chat.query.get(data['id'])
     if channel and channel.is_channel:
+        if not channel.is_public:
+            invite_secret = data.get("secret")
+            if not invite_secret or invite_secret != channel.secret:
+                return {"status": False, "reason": "private channel"}, 403
         if current_user not in channel.users:
             channel.users.append(current_user)
             # Create system message for new subscriber
@@ -131,6 +160,8 @@ def leaveChannel():
     data = request.json
     channel = Chat.query.get(data['from'])
     if channel and channel.is_channel and current_user in channel.users:
+        if current_user.id == channel.owner_id:
+            return {"status": False, "reason": "transfer owner first"}
         channel.users.remove(current_user)
         # If user was admin, remove admin status too
         if current_user in channel.admins:
@@ -161,7 +192,7 @@ def postToChannel():
     if not channel or not channel.is_channel:
         return {"status": False, "reason": "not a channel"}
     
-    if current_user not in channel.admins:
+    if not channel_user_is_admin(channel, current_user):
         return {"status": False, "reason": "not admin"}
     
     if current_user not in channel.users:
@@ -210,8 +241,7 @@ def addChannelAdmin():
     if channel and channel.is_channel:
         user = User.query.filter_by(username=data['username']).first()
         if user and user in channel.users:
-            # Only the first admin (owner) can add other admins
-            if current_user == channel.admins[0]:
+            if current_user.id == channel.owner_id:
                 if user not in channel.admins:
                     channel.admins.append(user)
                     msg = Message(
@@ -241,9 +271,7 @@ def removeChannelAdmin():
     if channel and channel.is_channel:
         user = User.query.filter_by(username=data['username']).first()
         if user and user in channel.admins:
-            # Only the first admin (owner) can remove other admins
-            # Cannot remove the owner
-            if current_user == channel.admins[0] and user != channel.admins[0]:
+            if current_user.id == channel.owner_id and user.id != channel.owner_id:
                 channel.admins.remove(user)
                 msg = Message(
                     text=f"{current_user.username} removed admin rights from {user.username}",
@@ -272,7 +300,7 @@ def saveChannelSettings():
     if not channel or not channel.is_channel:
         return {"status": False, "reason": "not a channel"}
     
-    if current_user not in channel.admins:
+    if not channel_user_is_admin(channel, current_user):
         return {"status": False, "reason": "not admin"}
     
     if "name" in data:

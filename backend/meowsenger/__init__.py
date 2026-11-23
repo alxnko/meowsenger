@@ -4,6 +4,7 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from meowsenger.config import Config
+from meowsenger.schema_migrations import run_chat_schema_upgrade
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -38,6 +39,7 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+        run_chat_schema_upgrade(db.engine)
 
     @app.errorhandler(404)
     def not_found(e):

@@ -154,8 +154,8 @@ export default function Channel() {
 
   useEffect(() => {
     if (channel && user) {
-      setIsAdmin(channel.admins.includes(user.username));
-      setIsOwner(user.username === channel.admins[0]);
+      setIsAdmin(channel.admins.includes(user.username) || user.username === channel.owner);
+      setIsOwner(user.username === channel.owner);
     }
   }, [user, channel]);
 
@@ -173,12 +173,12 @@ export default function Channel() {
     () => {
       fetchChannel();
     },
-    channel ? 600000 : 500
+    channel ? 60000 : 2000
   );
 
   useInterval(() => {
     fetchData();
-  }, 500);
+  }, 2000);
 
   useEffect(() => {
     setIsLoader(true);
@@ -209,7 +209,11 @@ export default function Channel() {
   const fetchChannel = async () => {
     await fetch(
       "/api/ch/get",
-      createPostData({ from: parseInt(channelId) })
+      createPostData({
+        from: parseInt(channelId),
+        messagesLimit: 100,
+        subscribersLimit: 100,
+      })
     )
       .then((res) => {
         if (res.status !== 200) {
@@ -455,6 +459,11 @@ export default function Channel() {
                 remove={() => {}}
               />
             ))}
+            {channel.subscribersHasMore ? (
+              <p className="center">{t("limitreached") || "Showing first subscribers only"}</p>
+            ) : (
+              ""
+            )}
           </PopUp>
 
           {isAdmin ? (

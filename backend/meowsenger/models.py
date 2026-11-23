@@ -63,6 +63,8 @@ class Chat(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     is_group = db.Column(db.Boolean, default=False)
     is_channel = db.Column(db.Boolean, default=False)
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    owner = db.relationship('User', foreign_keys=[owner_id], lazy=True)
     name = db.Column(db.String(20))
     messages = db.relationship('Message', backref='chat', lazy=True)
     updates = db.relationship('Update', backref='chat', lazy=True)
