@@ -16,6 +16,8 @@ const ChatBlock = forwardRef(({ chatData, noLinks, onClick }, ref) => {
         to={
           noLinks
             ? ""
+            : chatData.isChannel
+            ? "/channel/" + chatData.id
             : chatData.isGroup
             ? "/group/" + chatData.id
             : "/chat/" + chatData.url
@@ -24,7 +26,7 @@ const ChatBlock = forwardRef(({ chatData, noLinks, onClick }, ref) => {
         <button onClick={onClick ? onClick : () => {}} className="chat-prev">
           <div>
             <h2 style={{ fontSize: "24px" }}>
-              {chatData.isGroup ? "g." : "u."}
+              {chatData.isChannel ? "ch." : chatData.isGroup ? "g." : "u."}
               {chatData.name}
               <UserBadges user={chatData} />
             </h2>
@@ -42,7 +44,7 @@ const ChatBlock = forwardRef(({ chatData, noLinks, onClick }, ref) => {
                 ? chatData.lastMessage.author != ""
                   ? chatData.lastMessage.author == user.username
                     ? t("you") + ": "
-                    : chatData.isGroup
+                    : (chatData.isGroup || chatData.isChannel)
                     ? chatData.lastMessage.author + ": "
                     : ""
                   : ""

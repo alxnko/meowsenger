@@ -19,6 +19,8 @@ import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import Chat from "./pages/chats/Chat";
 import Chats from "./pages/chats/Chats";
+import Channel from "./pages/channels/Channel";
+import Channels from "./pages/channels/Channels";
 import SettingsPage from "./pages/user/SettingsPage";
 import UserPage from "./pages/user/UserPage";
 
@@ -74,6 +76,8 @@ export default function App() {
                   <Route path="chats" element={<Chats />} />
                   <Route path="chat/:username" element={<Chat />} />
                   <Route path="group/:groupId" element={<Chat />} />
+                  <Route path="channels" element={<Channels />} />
+                  <Route path="channel/:channelId" element={<Channel />} />
                   <Route path="user/:username" element={<UserPage />} />
                   <Route path="settings" element={<SettingsPage />} />
                   <Route path="*" element={<NoPage />} />

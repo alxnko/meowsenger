@@ -61,6 +61,8 @@ def get_new():
     chat_id = data["id"]
     last = data["last"]
     chat = Chat.query.get(chat_id)
+    if not chat:
+        return {"status": False, "reason": "chat not found"}, 404
     if current_user in chat.users:
         messages = Message.query.filter(
             Message.chat_id == chat_id, Message.send_time > datetime.fromtimestamp(last)).all()
@@ -83,27 +85,37 @@ def send_msg():
     data = request.json
     chat_id = data["id"]
     chat = Chat.query.get(chat_id)
+    if not chat:
+        return {"status": False, "reason": "chat not found"}, 404
     is_system = data["isSystem"] if "isSystem" in data else False
     reply_to = data["replyTo"] if "replyTo" in data else None
     is_forwarded = data["isForwarded"] if "isForwarded" in data else None
-    if current_user in chat.users:
-        text = data["text"]
-        message = Message(text=text, user_id=current_user.id, reply_to=reply_to, is_forwarded=is_forwarded,
-                          chat_id=chat_id, is_system=is_system)
-        for user in chat.users:
-            if user != current_user:
-                message.unread_by.append(user)
-        db.session.add(message)
-        db.session.commit()
-        chat.last_time = message.send_time
-        db.session.add(chat)
-        db.session.commit()
-        send_notification_to_chat_users(chat,
-                                        (f"({chat.name}){current_user.username}"
-                                         if chat.is_group else f"{current_user.username}")
-                                        + ":" + text + ":" + chat.secret + ":" + str(chat.id))
-        return {"status": True}
-    return {"status": False, "reason": "not in chat"}
+    
+    if current_user not in chat.users:
+        return {"status": False, "reason": "not in chat"}
+    
+    # Check if this is a channel and user has permission to post
+    if chat.is_channel and (current_user not in chat.admins and current_user.id != chat.owner_id):
+        return {"status": False, "reason": "only admins can post to channels"}
+    if chat.is_channel and is_system:
+        return {"status": False, "reason": "system messages are not allowed in channels"}
+    
+    text = data["text"]
+    message = Message(text=text, user_id=current_user.id, reply_to=reply_to, is_forwarded=is_forwarded,
+                      chat_id=chat_id, is_system=is_system)
+    for user in chat.users:
+        if user != current_user:
+            message.unread_by.append(user)
+    db.session.add(message)
+    db.session.commit()
+    chat.last_time = message.send_time
+    db.session.add(chat)
+    db.session.commit()
+    send_notification_to_chat_users(chat,
+                                    (f"({chat.name}){current_user.username}"
+                                     if chat.is_group or chat.is_channel else f"{current_user.username}")
+                                    + ":" + text + ":" + chat.secret + ":" + str(chat.id))
+    return {"status": True}
 
 
 @messages.route("/api/m/delete", methods=["POST"])
@@ -112,6 +124,8 @@ def delete_msg():
     data = request.json
     m_id = data["id"]
     message = Message.query.get(m_id)
+    if not message or current_user not in message.chat.users:
+        return {"status": False}
     if message.author == current_user:
         message.is_deleted = True
         db.session.add(message)
@@ -132,6 +146,8 @@ def edit_msg():
     data = request.json
     m_id = data["id"]
     message = Message.query.get(m_id)
+    if not message or current_user not in message.chat.users:
+        return {"status": False}
     if message.author == current_user:
         message.is_edited = True
         message.text = data["text"]

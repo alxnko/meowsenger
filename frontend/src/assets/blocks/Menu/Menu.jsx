@@ -5,6 +5,7 @@ import {
   BiSolidLogIn,
   BiSolidUser,
 } from "react-icons/bi";
+import { MdCampaign } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { AuthContext, TranslationContext } from "../../contexts/contexts";
 
@@ -18,11 +19,18 @@ export default function Menu({ isOnTop, switchMenu }) {
       className="menu"
     >
       {user != "unAuth" ? (
-        <Link to="/chats">
-          <button className="flex">
-            <BiSolidChat />
-          </button>
-        </Link>
+        <>
+          <Link to="/chats">
+            <button className="flex">
+              <BiSolidChat />
+            </button>
+          </Link>
+          <Link to="/channels">
+            <button className="flex">
+              <MdCampaign />
+            </button>
+          </Link>
+        </>
       ) : (
         <Link to="/login">
           <button className="flex">
